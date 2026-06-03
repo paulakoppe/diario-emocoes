@@ -19,18 +19,36 @@ export const metadata: Metadata = {
   title: "Diário de Emoções",
   description: "Um espaço fofo e leve para registrar como você se sente.",
   manifest: "/manifest.json",
+  applicationName: "Diário",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
     title: "Diário",
   },
+  icons: {
+    icon: [
+      { url: "/favicon-16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
+  formatDetection: {
+    telephone: false,
+  },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#FFF8F3",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#FFF8F3" },
+    { media: "(prefers-color-scheme: dark)", color: "#1E1A20" },
+  ],
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({

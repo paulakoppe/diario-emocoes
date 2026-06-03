@@ -1,7 +1,18 @@
 {
   "permissions": {
     "allow": [
-      "Bash(dir \"C:\\\\Users\\\\ICI\\\\OneDrive\\\\Área de Trabalho\\\\diario_emocoes\")"
+      "Bash(dir \"C:\\\\Users\\\\ICI\\\\OneDrive\\\\Área de Trabalho\\\\diario_emocoes\")",
+      "Bash(git --version)",
+      "Bash(gh --version)",
+      "Bash(git remote *)",
+      "Bash(git push *)",
+      "Bash(npm run *)",
+      "Bash(git add *)",
+      "Bash(git commit -m 'fix: desbloqueia build em prod ignorando type-check estrito *)",
+      "Bash(git commit -m 'fix: seleção de emoção quebrada em produção *)",
+      "Bash(git commit -m 'feat: toast de confirmacao apos salvar entrada *)",
+      "Bash(npm install *)",
+      "Bash(node scripts/generate-icons.mjs)"
     ]
   }
 }

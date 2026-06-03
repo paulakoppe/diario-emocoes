@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import BottomNav from "@/components/BottomNav";
+import InstallPrompt from "@/components/InstallPrompt";
 
 export default async function AppLayout({
   children,
@@ -19,6 +20,7 @@ export default async function AppLayout({
       <main className="max-w-2xl mx-auto px-4 pt-8 pb-4 animate-fade-in">
         {children}
       </main>
+      <InstallPrompt />
       <BottomNav />
     </div>
   );
