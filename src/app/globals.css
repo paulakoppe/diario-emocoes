@@ -1,0 +1,146 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-app: 255 248 243;     /* cream-100 */
+  --bg-card: 255 255 255;
+  --bg-soft: 255 239 228;    /* cream-200 */
+  --text-strong: 74 68 64;   /* ink-600 */
+  --text-soft: 122 116 112;  /* ink-400 */
+  --border-soft: 253 232 236;/* blush-100 */
+}
+
+html.dark {
+  --bg-app: 30 26 32;        /* deep plum-tinted ink */
+  --bg-card: 44 38 48;
+  --bg-soft: 58 50 62;
+  --text-strong: 245 237 240;
+  --text-soft: 188 178 184;
+  --border-soft: 70 60 74;
+}
+
+html,
+body {
+  background: rgb(var(--bg-app));
+  color: rgb(var(--text-strong));
+  min-height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+@layer base {
+  body {
+    @apply font-sans;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-blush-400 px-6 py-3 font-display font-semibold text-white shadow-soft transition hover:bg-blush-500 active:scale-95 disabled:opacity-50 disabled:pointer-events-none;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-display font-semibold shadow-soft transition active:scale-95 disabled:opacity-50 disabled:pointer-events-none;
+    background: rgb(var(--bg-card));
+    color: rgb(var(--text-strong));
+  }
+  .btn-secondary:hover {
+    background: rgb(var(--bg-soft));
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 font-display transition active:scale-95;
+    color: rgb(var(--text-soft));
+  }
+  .btn-ghost:hover {
+    background: rgb(var(--bg-soft));
+  }
+  .btn-icon {
+    @apply inline-flex items-center justify-center w-10 h-10 rounded-full transition active:scale-90;
+  }
+  .input-field {
+    @apply w-full rounded-2xl px-4 py-3 outline-none transition focus:ring-2 focus:ring-blush-200;
+    background: rgb(var(--bg-card));
+    color: rgb(var(--text-strong));
+    border: 1px solid rgb(var(--border-soft));
+  }
+  .input-field::placeholder {
+    color: rgb(var(--text-soft) / 0.6);
+  }
+  .input-field:focus {
+    border-color: #F4B6C2;
+  }
+  .card {
+    @apply rounded-3xl p-6 shadow-soft;
+    background: rgb(var(--bg-card));
+  }
+  .text-soft {
+    color: rgb(var(--text-soft));
+  }
+}
+
+/* Dark mode: ajusta cores de texto/bg que estão hardcoded em utilities Tailwind */
+html.dark .text-ink-400 { color: rgb(188 178 184); }
+html.dark .text-ink-500 { color: rgb(220 215 220); }
+html.dark .text-ink-600 { color: rgb(245 237 240); }
+html.dark .bg-white { background-color: rgb(var(--bg-card)); }
+html.dark .bg-cream-100 { background-color: rgb(var(--bg-app)); }
+html.dark .bg-cream-200 { background-color: rgb(var(--bg-soft)); }
+html.dark .border-blush-100 { border-color: rgb(var(--border-soft)); }
+html.dark .bg-blush-100 { background-color: rgba(244, 182, 194, 0.15); }
+html.dark .text-blush-500 { color: rgb(244, 182, 194); }
+html.dark .ring-white { --tw-ring-color: rgb(var(--bg-card)); }
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(220, 110, 133, 0.2);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(220, 110, 133, 0.4);
+}
+
+/* Range slider custom */
+input[type="range"].emotion-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  background: linear-gradient(to right, #FACFD7, #DC6E85);
+  border-radius: 999px;
+  outline: none;
+}
+input[type="range"].emotion-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 28px;
+  height: 28px;
+  background: white;
+  border: 3px solid #DC6E85;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(220, 110, 133, 0.3);
+  transition: transform 0.15s;
+}
+input[type="range"].emotion-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+}
+input[type="range"].emotion-slider::-moz-range-thumb {
+  width: 28px;
+  height: 28px;
+  background: white;
+  border: 3px solid #DC6E85;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(220, 110, 133, 0.3);
+}
