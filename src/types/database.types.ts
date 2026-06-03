@@ -27,22 +27,55 @@ export interface DiaryEntry {
   created_at: string;
 }
 
-export interface Database {
+export type Database = {
   public: {
     Tables: {
       profiles: {
         Row: Profile;
-        Insert: Partial<Profile> & { id: string };
-        Update: Partial<Profile>;
+        Insert: {
+          id: string;
+          name?: string | null;
+          phone?: string | null;
+          email?: string | null;
+          avatar_url?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string | null;
+          phone?: string | null;
+          email?: string | null;
+          avatar_url?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
       };
       diary_entries: {
         Row: DiaryEntry;
-        Insert: Omit<DiaryEntry, "id" | "created_at"> & {
+        Insert: {
           id?: string;
+          user_id: string;
+          emotion: Emotion;
+          intensity: number;
+          text?: string | null;
           created_at?: string;
         };
-        Update: Partial<DiaryEntry>;
+        Update: {
+          id?: string;
+          user_id?: string;
+          emotion?: Emotion;
+          intensity?: number;
+          text?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
       };
     };
+    Views: { [_ in never]: never };
+    Functions: { [_ in never]: never };
+    Enums: { [_ in never]: never };
+    CompositeTypes: { [_ in never]: never };
   };
-}
+};
