@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, useEffect, type FormEvent } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Check, Loader2, Sparkles } from "lucide-react";
+import { Check, Loader2, Sparkles, History, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { EMOTIONS } from "@/lib/emotions";
 import type { Emotion } from "@/types/database.types";
@@ -16,7 +17,15 @@ export default function DiaryForm() {
   const [text, setText] = useState("");
   const [saving, setSaving] = useState(false);
   const [savedFlag, setSavedFlag] = useState(false);
+  const [showToast, setShowToast] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Auto-dismiss do toast após 6s
+  useEffect(() => {
+    if (!showToast) return;
+    const t = setTimeout(() => setShowToast(false), 6000);
+    return () => clearTimeout(t);
+  }, [showToast]);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -43,6 +52,7 @@ export default function DiaryForm() {
       if (error) throw error;
 
       setSavedFlag(true);
+      setShowToast(true);
       setEmotion(null);
       setIntensity(5);
       setText("");
@@ -59,7 +69,42 @@ export default function DiaryForm() {
     intensity <= 3 ? "Bem leve" : intensity <= 6 ? "Médio" : intensity <= 8 ? "Forte" : "Muito forte";
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <>
+      {showToast && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-md animate-slide-up">
+          <div className="card flex items-start gap-3 shadow-soft-lg border border-mint-200">
+            <div className="w-10 h-10 rounded-full bg-mint-200 flex items-center justify-center shrink-0">
+              <Check className="w-5 h-5 text-mint-400" strokeWidth={3} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-display font-bold text-ink-600">
+                Salvo com carinho! 🌷
+              </p>
+              <p className="text-sm text-soft font-display mt-0.5">
+                Seu registro tá guardadinho na aba{" "}
+                <strong className="text-ink-600">Histórico</strong>.
+              </p>
+              <Link
+                href="/historico"
+                className="inline-flex items-center gap-1 mt-2 text-sm font-display font-semibold text-blush-500 hover:text-blush-400"
+              >
+                <History className="w-4 h-4" />
+                Ver agora
+              </Link>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowToast(false)}
+              className="w-8 h-8 rounded-full hover:bg-cream-200 flex items-center justify-center shrink-0 text-soft"
+              aria-label="Fechar"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-6">
       <section className="card">
         <h2 className="font-display font-bold text-lg mb-1">
           Que emoção é essa?
@@ -173,5 +218,6 @@ export default function DiaryForm() {
         )}
       </button>
     </form>
+    </>
   );
 }
