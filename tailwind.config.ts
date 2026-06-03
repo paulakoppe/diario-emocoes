@@ -6,6 +6,14 @@ const config: Config = {
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/lib/**/*.{js,ts,jsx,tsx,mdx}",
+  ],
+  safelist: [
+    // Classes geradas dinamicamente a partir de emotions.ts — garantir que entrem no bundle
+    "bg-butter-200", "bg-blush-200", "bg-mint-200", "bg-lavender-200",
+    "bg-blue-100", "bg-purple-100", "bg-red-100", "bg-gray-100",
+    "ring-butter-300", "ring-blush-400", "ring-mint-400", "ring-lavender-400",
+    "ring-blue-300", "ring-purple-300", "ring-red-300", "ring-gray-300",
   ],
   theme: {
     extend: {

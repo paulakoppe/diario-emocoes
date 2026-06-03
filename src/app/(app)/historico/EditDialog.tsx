@@ -97,15 +97,18 @@ export default function EditDialog({ entry, onClose }: Props) {
                     type="button"
                     onClick={() => setEmotion(e.id)}
                     className={`flex flex-col items-center gap-0.5 p-2 rounded-2xl transition ${
-                      e.bgClass
-                    } ${
                       selected
-                        ? `ring-4 ${e.ringClass} animate-pop`
-                        : "ring-0 hover:scale-105 opacity-80"
+                        ? `${e.bgClass} ring-4 ${e.ringClass} animate-pop`
+                        : "bg-cream-200 hover:scale-105"
                     }`}
+                    style={selected ? { color: "#4A4440" } : undefined}
                   >
                     <span className="text-2xl">{e.emoji}</span>
-                    <span className="text-[10px] font-display font-semibold text-ink-600">
+                    <span
+                      className={`text-[10px] font-display font-semibold ${
+                        selected ? "" : "text-soft"
+                      }`}
+                    >
                       {e.label}
                     </span>
                   </button>
