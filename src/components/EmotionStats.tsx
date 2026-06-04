@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { TrendingUp, Calendar } from "lucide-react";
-import { EMOTIONS, emotionById } from "@/lib/emotions";
+import { EMOTIONS, emotionById, getEntryEmotions } from "@/lib/emotions";
 import type { DiaryEntry, Emotion } from "@/types/database.types";
 
 interface Props {
@@ -193,8 +193,8 @@ function computeStats(entries: DiaryEntry[], range: Range): ComputedStats {
   let totalOccurrences = 0;
   let positiveOccurrences = 0;
   for (const entry of filtered) {
-    for (const id of entry.emotions) {
-      countByEmotion.set(id, (countByEmotion.get(id) ?? 0) + 1);
+    for (const id of getEntryEmotions(entry)) {
+      countByEmotion.set(id as Emotion, (countByEmotion.get(id as Emotion) ?? 0) + 1);
       totalOccurrences++;
       if (emotionById(id)?.tone === "positive") positiveOccurrences++;
     }

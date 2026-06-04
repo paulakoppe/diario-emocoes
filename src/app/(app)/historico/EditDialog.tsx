@@ -16,7 +16,13 @@ export default function EditDialog({ entry, onClose }: Props) {
   const router = useRouter();
   const supabase = createClient();
 
-  const [emotions, setEmotions] = useState<Emotion[]>(entry.emotions);
+  // Fallback resiliente: aceita schema antigo (emotion) e novo (emotions)
+  const initialEmotions = Array.isArray(entry.emotions)
+    ? entry.emotions
+    : (entry as unknown as { emotion?: Emotion }).emotion
+      ? [(entry as unknown as { emotion: Emotion }).emotion]
+      : [];
+  const [emotions, setEmotions] = useState<Emotion[]>(initialEmotions);
   const [intensity, setIntensity] = useState(entry.intensity);
 
   function toggleEmotion(id: Emotion) {

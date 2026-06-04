@@ -14,7 +14,10 @@
       "Bash(npm install *)",
       "Bash(node scripts/generate-icons.mjs)",
       "Bash(git commit -m 'feat: PWA instalavel com icones e prompt de instalacao *)",
-      "Bash(git commit -m 'feat: multiplas emocoes por entrada + fix saudacao timezone *)"
+      "Bash(git commit -m 'feat: multiplas emocoes por entrada + fix saudacao timezone *)",
+      "Bash(git commit -m 'fix: saudacao agora atualiza para hora local apos hydration *)",
+      "Bash(git commit -m 'fix: data do email usa timezone Sao Paulo \\(nao UTC do servidor\\) *)",
+      "Bash(git commit -m 'fix: resiliencia para schema antigo \\(emotion\\) e novo \\(emotions\\) *)"
     ]
   }
 }

@@ -87,3 +87,21 @@ export const EMOTIONS: EmotionMeta[] = [
 
 export const emotionById = (id: string): EmotionMeta | undefined =>
   EMOTIONS.find((e) => e.id === id);
+
+/**
+ * Extrai a lista de emoções de uma entry, tolerante a schemas antigos.
+ * - Schema novo: { emotions: ["feliz", "grato"] }
+ * - Schema antigo: { emotion: "feliz" }
+ * - Schema corrompido/parcial: retorna []
+ */
+export function getEntryEmotions(entry: unknown): string[] {
+  if (!entry || typeof entry !== "object") return [];
+  const e = entry as Record<string, unknown>;
+  if (Array.isArray(e.emotions)) {
+    return e.emotions.filter((x): x is string => typeof x === "string");
+  }
+  if (typeof e.emotion === "string") {
+    return [e.emotion];
+  }
+  return [];
+}

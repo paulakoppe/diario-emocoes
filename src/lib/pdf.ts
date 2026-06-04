@@ -1,5 +1,5 @@
 import jsPDF from "jspdf";
-import { emotionById } from "./emotions";
+import { emotionById, getEntryEmotions } from "./emotions";
 import type { DiaryEntry } from "@/types/database.types";
 
 export interface PdfMeta {
@@ -54,21 +54,22 @@ export function buildEntryPdf(entry: DiaryEntry, meta: PdfMeta): jsPDF {
   doc.setTextColor(122, 116, 112);
   doc.text(`${dateStr} · ${timeStr}`, margin, 130);
 
-  // Emoções (pode ter várias)
-  const metas = entry.emotions
+  // Emoções (pode ter várias) — usa helper resiliente
+  const emotionIds = getEntryEmotions(entry);
+  const metas = emotionIds
     .map((id) => emotionById(id))
     .filter((m): m is NonNullable<typeof m> => Boolean(m));
 
   doc.setFont("helvetica", "bold");
   doc.setFontSize(16);
   doc.setTextColor(74, 68, 64);
-  doc.text(metas.length > 1 ? "Como me sentia" : "Como me sentia", margin, 170);
+  doc.text("Como me sentia", margin, 170);
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(14);
   const emotionLabel = metas.length
     ? metas.map((m) => `${m.emoji}  ${m.label}`).join("    ")
-    : entry.emotions.join(", ");
+    : emotionIds.join(", ");
   const emotionLines = doc.splitTextToSize(emotionLabel, pageWidth - margin * 2);
   doc.text(emotionLines, margin, 196);
 

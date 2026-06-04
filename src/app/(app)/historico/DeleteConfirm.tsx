@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Trash2, X, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { emotionById } from "@/lib/emotions";
+import { emotionById, getEntryEmotions } from "@/lib/emotions";
 import type { DiaryEntry } from "@/types/database.types";
 
 interface Props {
@@ -18,7 +18,7 @@ export default function DeleteConfirm({ entry, onClose }: Props) {
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const metas = entry.emotions
+  const metas = getEntryEmotions(entry)
     .map((id) => emotionById(id))
     .filter((m): m is NonNullable<typeof m> => Boolean(m));
   const dateStr = new Date(entry.created_at).toLocaleDateString("pt-BR");

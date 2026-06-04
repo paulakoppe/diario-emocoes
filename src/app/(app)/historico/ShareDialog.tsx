@@ -57,7 +57,12 @@ export default function ShareDialog({
           filename,
           pdfBase64,
           entry: {
-            emotions: entry.emotions,
+            // Fallback resiliente caso schema antigo ainda exista
+            emotions: Array.isArray(entry.emotions)
+              ? entry.emotions
+              : (entry as unknown as { emotion?: string }).emotion
+                ? [(entry as unknown as { emotion: string }).emotion]
+                : [],
             intensity: entry.intensity,
             created_at: entry.created_at,
           },

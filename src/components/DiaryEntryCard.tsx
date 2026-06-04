@@ -1,7 +1,7 @@
 "use client";
 
 import { Send, Pencil, Trash2 } from "lucide-react";
-import { emotionById } from "@/lib/emotions";
+import { emotionById, getEntryEmotions } from "@/lib/emotions";
 import type { DiaryEntry } from "@/types/database.types";
 
 interface Props {
@@ -24,7 +24,7 @@ export default function DiaryEntryCard({ entry, onShare, onEdit, onDelete }: Pro
   });
 
   // Fallback: se vier 1 só, mantém visual atual
-  const metas = entry.emotions
+  const metas = getEntryEmotions(entry)
     .map((id) => emotionById(id))
     .filter((m): m is NonNullable<typeof m> => Boolean(m));
   const labels = metas.map((m) => m.label).join(", ");
