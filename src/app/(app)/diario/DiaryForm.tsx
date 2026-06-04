@@ -3,7 +3,7 @@
 import { useState, useEffect, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Check, Loader2, Sparkles, History, X } from "lucide-react";
+import { Check, Loader2, History, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { EMOTIONS } from "@/lib/emotions";
 import type { Emotion } from "@/types/database.types";
@@ -36,7 +36,7 @@ export default function DiaryForm() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (emotions.length === 0) {
-      setError("Escolha pelo menos uma emoção primeiro 💛");
+      setError("Escolha pelo menos uma emoção.");
       return;
     }
     setError(null);
@@ -83,11 +83,9 @@ export default function DiaryForm() {
               <Check className="w-5 h-5 text-mint-400" strokeWidth={3} />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-display font-bold text-ink-600">
-                Salvo com carinho! 🌷
-              </p>
+              <p className="font-display font-bold text-ink-600">Salvo.</p>
               <p className="text-sm text-soft font-display mt-0.5">
-                Seu registro tá guardadinho na aba{" "}
+                Você encontra esse registro no{" "}
                 <strong className="text-ink-600">Histórico</strong>.
               </p>
               <Link
@@ -123,7 +121,7 @@ export default function DiaryForm() {
           )}
         </div>
         <p className="text-xs text-ink-400 font-display mb-4">
-          Toque em todas que combinam com você agora.
+          Pode escolher quantas quiser.
         </p>
 
         <div className="grid grid-cols-4 gap-3">
@@ -201,7 +199,7 @@ export default function DiaryForm() {
           className="input-field resize-none"
         />
         <p className="text-xs text-ink-400 font-display mt-2 ml-2">
-          Opcional, mas escrever ajuda 🌷
+          Opcional.
         </p>
       </section>
 
@@ -218,16 +216,14 @@ export default function DiaryForm() {
       >
         {saving ? (
           <>
-            <Loader2 className="w-5 h-5 animate-spin" /> Salvando…
+            <Loader2 className="w-5 h-5 animate-spin" /> Salvando
           </>
         ) : savedFlag ? (
           <>
-            <Check className="w-5 h-5" /> Salvo com carinho!
+            <Check className="w-5 h-5" /> Salvo
           </>
         ) : (
-          <>
-            <Sparkles className="w-5 h-5" /> Salvar no diário
-          </>
+          "Salvar"
         )}
       </button>
     </form>

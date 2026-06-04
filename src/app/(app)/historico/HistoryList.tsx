@@ -28,10 +28,10 @@ export default function HistoryList({ entries, userName, userEmail }: Props) {
           <BookHeart className="w-8 h-8 text-blush-400" />
         </div>
         <p className="font-display font-semibold text-ink-500">
-          Você ainda não tem registros.
+          Nenhum registro ainda.
         </p>
         <p className="text-sm text-ink-400 font-display mt-1">
-          Que tal abrir o diário agora? 🌷
+          Abra o diário pra começar.
         </p>
       </div>
     );

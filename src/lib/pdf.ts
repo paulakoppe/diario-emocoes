@@ -109,7 +109,7 @@ export function buildEntryPdf(entry: DiaryEntry, meta: PdfMeta): jsPDF {
   doc.setFontSize(9);
   doc.setTextColor(180, 174, 170);
   doc.text(
-    "Feito com carinho 🌸  ·  Diário de Emoções",
+    "Diário de Emoções",
     pageWidth / 2,
     doc.internal.pageSize.getHeight() - 30,
     { align: "center" },

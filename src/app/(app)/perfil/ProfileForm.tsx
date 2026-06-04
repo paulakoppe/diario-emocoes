@@ -148,7 +148,7 @@ export default function ProfileForm({ initialProfile }: Props) {
 
         {!avatarUrl && (
           <p className="mt-3 text-xs font-display text-ink-400">
-            Sem foto? Sem problema 💕
+            Sem foto, sem problema.
           </p>
         )}
       </div>
@@ -164,7 +164,7 @@ export default function ProfileForm({ initialProfile }: Props) {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Como você quer ser chamada(o)?"
+              placeholder="Como quer ser chamada(o)"
               className="input-field pl-12"
             />
           </div>

@@ -21,7 +21,7 @@ export default async function DiarioPage() {
       <header className="mb-6">
         <Greeting firstName={firstName} />
         <p className="text-ink-400 font-display text-sm mt-1">
-          Como você está se sentindo agora?
+          Como você está agora?
         </p>
       </header>
 

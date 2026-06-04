@@ -9,27 +9,33 @@ function greetingForHour(h: number): string {
   return "Boa noite";
 }
 
+function emojiForHour(h: number): string {
+  if (h < 5) return "🌙";
+  if (h < 12) return "☀️";
+  if (h < 18) return "☀️";
+  return "🌙";
+}
+
 interface Props {
   firstName?: string;
 }
 
 export default function Greeting({ firstName }: Props) {
-  // mounted força um re-render após hydration, garantindo que usamos
-  // a hora local do navegador (não a UTC do servidor Vercel).
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const greeting = mounted
-    ? greetingForHour(new Date().getHours())
-    : "Olá";
+  const hour = mounted ? new Date().getHours() : 0;
+  const greeting = mounted ? greetingForHour(hour) : "Olá";
+  const emoji = mounted ? emojiForHour(hour) : "";
 
   return (
     <h1 className="text-3xl font-display font-bold">
       {greeting}
-      {firstName ? `, ${firstName}` : ""} 🌷
+      {firstName ? `, ${firstName}` : ""}
+      {emoji && <span className="ml-2">{emoji}</span>}
     </h1>
   );
 }

@@ -96,7 +96,7 @@ export default function LoginPage() {
             Diário de Emoções
           </h1>
           <p className="text-ink-400 mt-2 font-display">
-            Um espaço só seu, com carinho.
+            Um espaço só seu.
           </p>
         </div>
 
@@ -246,7 +246,7 @@ export default function LoginPage() {
         </div>
 
         <p className="text-center text-xs text-ink-400 mt-6 font-display">
-          Feito com carinho 🌸
+          Diário de Emoções
         </p>
       </div>
     </main>

@@ -21,7 +21,7 @@ export default async function PerfilPage() {
         <div>
           <h1 className="text-3xl font-display font-bold">Seu perfil</h1>
           <p className="text-soft font-display text-sm">
-            Quem é você por aqui?
+            Suas informações.
           </p>
         </div>
         <LogoutButton />

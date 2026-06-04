@@ -77,10 +77,10 @@ export async function POST(request: Request) {
     const { error } = await resend.emails.send({
       from: process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev",
       to,
-      subject: `${author} compartilhou um registro do diário 🌷`,
+      subject: `${author} compartilhou um registro do diário`,
       html: `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 480px; margin: 0 auto; padding: 24px; background: #FFF8F3; border-radius: 16px; color: #4A4440;">
-          <h1 style="margin: 0 0 8px; color: #DC6E85; font-size: 22px;">Diário de Emoções 🌸</h1>
+          <h1 style="margin: 0 0 8px; color: #DC6E85; font-size: 22px;">Diário de Emoções</h1>
           <p style="margin: 0 0 16px; color: #7A7470; font-size: 14px;">
             <strong>${escapeHtml(author)}</strong> compartilhou um registro com você.
           </p>
@@ -95,9 +95,6 @@ export async function POST(request: Request) {
           </div>
           <p style="margin: 0; font-size: 13px; color: #7A7470;">
             O registro completo está no PDF em anexo.
-          </p>
-          <p style="margin: 24px 0 0; font-size: 11px; color: #B4AEAA; text-align: center;">
-            Feito com carinho 🌸
           </p>
         </div>
       `,

@@ -106,10 +106,10 @@ export default function InstallPrompt() {
           {showIosInstructions ? (
             <>
               <p className="font-display font-bold text-ink-600 text-sm">
-                Instalar no iPhone 🌷
+                Instalar no iPhone
               </p>
               <p className="text-xs text-soft font-display mt-0.5">
-                Toque em <strong>Compartilhar</strong> (ícone abaixo) e depois{" "}
+                Toque em <strong>Compartilhar</strong> e depois em{" "}
                 <strong>Adicionar à Tela de Início</strong>.
               </p>
             </>
@@ -119,7 +119,7 @@ export default function InstallPrompt() {
                 Instalar o Diário?
               </p>
               <p className="text-xs text-soft font-display mt-0.5">
-                Tenha o app sempre à mão, em tela cheia, na sua home.
+                Abra direto da sua tela inicial.
               </p>
               <button
                 type="button"

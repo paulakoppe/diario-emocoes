@@ -26,7 +26,7 @@ export default async function HistoricoPage() {
       <header className="mb-6">
         <h1 className="text-3xl font-display font-bold">Seu histórico</h1>
         <p className="text-ink-400 font-display text-sm mt-1">
-          Cada registro é um pedacinho de você.
+          Seus registros.
         </p>
       </header>
 

@@ -49,7 +49,7 @@ export default function EditDialog({ entry, onClose }: Props) {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (emotions.length === 0) {
-      setError("Escolha pelo menos uma emoção 💛");
+      setError("Escolha pelo menos uma emoção.");
       return;
     }
     setError(null);

@@ -17,7 +17,9 @@
       "Bash(git commit -m 'feat: multiplas emocoes por entrada + fix saudacao timezone *)",
       "Bash(git commit -m 'fix: saudacao agora atualiza para hora local apos hydration *)",
       "Bash(git commit -m 'fix: data do email usa timezone Sao Paulo \\(nao UTC do servidor\\) *)",
-      "Bash(git commit -m 'fix: resiliencia para schema antigo \\(emotion\\) e novo \\(emotions\\) *)"
+      "Bash(git commit -m 'fix: resiliencia para schema antigo \\(emotion\\) e novo \\(emotions\\) *)",
+      "Bash(git commit -m 'fix: gradiente do fundo do login agora adapta a dark mode *)",
+      "Bash(git commit -m 'tone: escrita mais seca, menos emoji decorativo; sol/lua na saudacao *)"
     ]
   }
 }
