@@ -14,21 +14,20 @@ interface Props {
 }
 
 export default function Greeting({ firstName }: Props) {
-  // Inicializa com hora atual (pode ser do servidor em UTC no primeiro render)
-  const [greeting, setGreeting] = useState(() =>
-    greetingForHour(new Date().getHours()),
-  );
+  // mounted força um re-render após hydration, garantindo que usamos
+  // a hora local do navegador (não a UTC do servidor Vercel).
+  const [mounted, setMounted] = useState(false);
 
-  // Recalcula no cliente com hora local
   useEffect(() => {
-    setGreeting(greetingForHour(new Date().getHours()));
+    setMounted(true);
   }, []);
 
+  const greeting = mounted
+    ? greetingForHour(new Date().getHours())
+    : "Olá";
+
   return (
-    <h1
-      className="text-3xl font-display font-bold"
-      suppressHydrationWarning
-    >
+    <h1 className="text-3xl font-display font-bold">
       {greeting}
       {firstName ? `, ${firstName}` : ""} 🌷
     </h1>
