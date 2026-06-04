@@ -86,7 +86,7 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4 py-10 bg-gradient-to-b from-cream-100 via-blush-100 to-lavender-100">
+    <main className="min-h-screen flex items-center justify-center px-4 py-10 bg-gradient-to-b from-cream-100 via-blush-100 to-lavender-100 dark:from-[rgb(30,26,32)] dark:via-[rgb(40,28,46)] dark:to-[rgb(50,30,62)]">
       <div className="w-full max-w-md animate-slide-up">
         <div className="text-center mb-8">
           <div className="inline-flex w-20 h-20 items-center justify-center rounded-full bg-white shadow-soft mb-4">
