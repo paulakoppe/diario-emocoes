@@ -22,7 +22,7 @@ const MOCK_ENTRIES: DiaryEntry[] = [
   {
     id: "1",
     user_id: "demo",
-    emotion: "grato",
+    emotions: ["grato", "calmo"],
     intensity: 8,
     text: "Hoje meu café da manhã teve sol entrando pela janela. Coisas simples, sabe? Fiquei pensando como faz tempo que eu não notava esses detalhes.",
     created_at: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(),
@@ -30,7 +30,7 @@ const MOCK_ENTRIES: DiaryEntry[] = [
   {
     id: "2",
     user_id: "demo",
-    emotion: "ansioso",
+    emotions: ["ansioso", "cansado"],
     intensity: 6,
     text: "Reunião amanhã cedo. Tô tentando não ficar remoendo, mas a cabeça insiste.",
     created_at: new Date(Date.now() - 1000 * 60 * 60 * 27).toISOString(),
@@ -38,7 +38,7 @@ const MOCK_ENTRIES: DiaryEntry[] = [
   {
     id: "3",
     user_id: "demo",
-    emotion: "calmo",
+    emotions: ["calmo"],
     intensity: 7,
     text: "Caminhada longa no parque. Voltei mais leve.",
     created_at: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
@@ -238,9 +238,15 @@ function PerfilPreview() {
 
 /* ─── Diário ─── */
 function DiarioPreview() {
-  const [emotion, setEmotion] = useState<Emotion | null>("grato");
+  const [emotions, setEmotions] = useState<Emotion[]>(["grato", "calmo"]);
   const [intensity, setIntensity] = useState(7);
   const [text, setText] = useState("");
+
+  function toggleEmotion(id: Emotion) {
+    setEmotions((prev) =>
+      prev.includes(id) ? prev.filter((e) => e !== id) : [...prev, id],
+    );
+  }
 
   const label =
     intensity <= 3 ? "Bem leve" : intensity <= 6 ? "Médio" : intensity <= 8 ? "Forte" : "Muito forte";
@@ -256,20 +262,27 @@ function DiarioPreview() {
 
       <div className="space-y-6">
         <section className="card">
-          <h2 className="font-display font-bold text-lg mb-1">
-            Que emoção é essa?
-          </h2>
+          <div className="flex items-baseline justify-between mb-1">
+            <h2 className="font-display font-bold text-lg">
+              Que emoções são essas?
+            </h2>
+            {emotions.length > 0 && (
+              <span className="text-xs font-display font-semibold text-blush-500">
+                {emotions.length} selecionada{emotions.length > 1 ? "s" : ""}
+              </span>
+            )}
+          </div>
           <p className="text-xs text-ink-400 font-display mb-4">
-            Toque na que mais combina com você agora.
+            Toque em todas que combinam com você agora.
           </p>
           <div className="grid grid-cols-4 gap-3">
             {EMOTIONS.map((e) => {
-              const selected = emotion === e.id;
+              const selected = emotions.includes(e.id);
               return (
                 <button
                   key={e.id}
                   type="button"
-                  onClick={() => setEmotion(e.id)}
+                  onClick={() => toggleEmotion(e.id)}
                   className={`flex flex-col items-center gap-1 p-3 rounded-2xl transition ${
                     selected
                       ? `${e.bgClass} ring-4 ${e.ringClass} animate-pop`

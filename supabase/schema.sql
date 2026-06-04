@@ -22,7 +22,7 @@ create table if not exists public.profiles (
 create table if not exists public.diary_entries (
   id uuid not null default gen_random_uuid() primary key,
   user_id uuid not null references auth.users on delete cascade,
-  emotion text not null,
+  emotions text[] not null check (array_length(emotions, 1) >= 1),
   intensity integer not null check (intensity between 1 and 10),
   text text,
   created_at timestamptz not null default now()

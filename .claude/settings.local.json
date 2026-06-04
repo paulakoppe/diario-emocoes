@@ -12,7 +12,9 @@
       "Bash(git commit -m 'fix: seleção de emoção quebrada em produção *)",
       "Bash(git commit -m 'feat: toast de confirmacao apos salvar entrada *)",
       "Bash(npm install *)",
-      "Bash(node scripts/generate-icons.mjs)"
+      "Bash(node scripts/generate-icons.mjs)",
+      "Bash(git commit -m 'feat: PWA instalavel com icones e prompt de instalacao *)",
+      "Bash(git commit -m 'feat: multiplas emocoes por entrada + fix saudacao timezone *)"
     ]
   }
 }

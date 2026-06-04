@@ -188,9 +188,16 @@ function computeStats(entries: DiaryEntry[], range: Range): ComputedStats {
   const avgIntensity =
     filtered.reduce((acc, e) => acc + e.intensity, 0) / total;
 
+  // Cada entrada pode ter várias emoções — cada uma conta como uma "ocorrência"
   const countByEmotion = new Map<Emotion, number>();
-  for (const e of filtered) {
-    countByEmotion.set(e.emotion, (countByEmotion.get(e.emotion) ?? 0) + 1);
+  let totalOccurrences = 0;
+  let positiveOccurrences = 0;
+  for (const entry of filtered) {
+    for (const id of entry.emotions) {
+      countByEmotion.set(id, (countByEmotion.get(id) ?? 0) + 1);
+      totalOccurrences++;
+      if (emotionById(id)?.tone === "positive") positiveOccurrences++;
+    }
   }
 
   const distribution = EMOTIONS.map((e) => {
@@ -198,7 +205,7 @@ function computeStats(entries: DiaryEntry[], range: Range): ComputedStats {
     return {
       emotion: e.id,
       count,
-      pct: Math.round((count / total) * 100),
+      pct: totalOccurrences > 0 ? Math.round((count / totalOccurrences) * 100) : 0,
     };
   })
     .filter((d) => d.count > 0)
@@ -210,10 +217,7 @@ function computeStats(entries: DiaryEntry[], range: Range): ComputedStats {
     ? { id: topMeta.id, label: topMeta.label, emoji: topMeta.emoji }
     : null;
 
-  const positiveCount = filtered.filter(
-    (e) => emotionById(e.emotion)?.tone === "positive",
-  ).length;
-  const positiveRatio = positiveCount / total;
+  const positiveRatio = totalOccurrences > 0 ? positiveOccurrences / totalOccurrences : 0;
 
   return {
     total,

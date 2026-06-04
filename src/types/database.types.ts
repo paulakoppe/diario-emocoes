@@ -21,7 +21,7 @@ export interface Profile {
 export interface DiaryEntry {
   id: string;
   user_id: string;
-  emotion: Emotion;
+  emotions: Emotion[];
   intensity: number;
   text: string | null;
   created_at: string;
@@ -57,7 +57,7 @@ export type Database = {
         Insert: {
           id?: string;
           user_id: string;
-          emotion: Emotion;
+          emotions: Emotion[];
           intensity: number;
           text?: string | null;
           created_at?: string;
@@ -65,7 +65,7 @@ export type Database = {
         Update: {
           id?: string;
           user_id?: string;
-          emotion?: Emotion;
+          emotions?: Emotion[];
           intensity?: number;
           text?: string | null;
           created_at?: string;

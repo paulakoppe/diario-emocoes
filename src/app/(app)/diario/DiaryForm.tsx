@@ -12,8 +12,14 @@ export default function DiaryForm() {
   const router = useRouter();
   const supabase = createClient();
 
-  const [emotion, setEmotion] = useState<Emotion | null>(null);
+  const [emotions, setEmotions] = useState<Emotion[]>([]);
   const [intensity, setIntensity] = useState(5);
+
+  function toggleEmotion(id: Emotion) {
+    setEmotions((prev) =>
+      prev.includes(id) ? prev.filter((e) => e !== id) : [...prev, id],
+    );
+  }
   const [text, setText] = useState("");
   const [saving, setSaving] = useState(false);
   const [savedFlag, setSavedFlag] = useState(false);
@@ -29,8 +35,8 @@ export default function DiaryForm() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!emotion) {
-      setError("Escolha uma emoção primeiro 💛");
+    if (emotions.length === 0) {
+      setError("Escolha pelo menos uma emoção primeiro 💛");
       return;
     }
     setError(null);
@@ -45,7 +51,7 @@ export default function DiaryForm() {
 
       const { error } = await supabase.from("diary_entries").insert({
         user_id: user.id,
-        emotion,
+        emotions,
         intensity,
         text: text.trim() || null,
       });
@@ -53,7 +59,7 @@ export default function DiaryForm() {
 
       setSavedFlag(true);
       setShowToast(true);
-      setEmotion(null);
+      setEmotions([]);
       setIntensity(5);
       setText("");
       setTimeout(() => setSavedFlag(false), 2500);
@@ -106,21 +112,28 @@ export default function DiaryForm() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
       <section className="card">
-        <h2 className="font-display font-bold text-lg mb-1">
-          Que emoção é essa?
-        </h2>
+        <div className="flex items-baseline justify-between mb-1">
+          <h2 className="font-display font-bold text-lg">
+            Que emoções são essas?
+          </h2>
+          {emotions.length > 0 && (
+            <span className="text-xs font-display font-semibold text-blush-500">
+              {emotions.length} selecionada{emotions.length > 1 ? "s" : ""}
+            </span>
+          )}
+        </div>
         <p className="text-xs text-ink-400 font-display mb-4">
-          Toque na que mais combina com você agora.
+          Toque em todas que combinam com você agora.
         </p>
 
         <div className="grid grid-cols-4 gap-3">
           {EMOTIONS.map((e) => {
-            const selected = emotion === e.id;
+            const selected = emotions.includes(e.id);
             return (
               <button
                 key={e.id}
                 type="button"
-                onClick={() => setEmotion(e.id)}
+                onClick={() => toggleEmotion(e.id)}
                 className={`flex flex-col items-center gap-1 p-3 rounded-2xl transition ${
                   selected
                     ? `${e.bgClass} ring-4 ${e.ringClass} animate-pop`
@@ -146,7 +159,7 @@ export default function DiaryForm() {
 
       <section
         className={`card transition ${
-          emotion ? "opacity-100" : "opacity-50 pointer-events-none"
+          emotions.length > 0 ? "opacity-100" : "opacity-50 pointer-events-none"
         }`}
       >
         <div className="flex items-center justify-between mb-3">
@@ -174,7 +187,7 @@ export default function DiaryForm() {
 
       <section
         className={`card transition ${
-          emotion ? "opacity-100" : "opacity-50 pointer-events-none"
+          emotions.length > 0 ? "opacity-100" : "opacity-50 pointer-events-none"
         }`}
       >
         <h2 className="font-display font-bold text-lg mb-3">
@@ -200,7 +213,7 @@ export default function DiaryForm() {
 
       <button
         type="submit"
-        disabled={saving || !emotion}
+        disabled={saving || emotions.length === 0}
         className="btn-primary w-full"
       >
         {saving ? (

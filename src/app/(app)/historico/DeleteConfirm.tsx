@@ -18,7 +18,9 @@ export default function DeleteConfirm({ entry, onClose }: Props) {
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const meta = emotionById(entry.emotion);
+  const metas = entry.emotions
+    .map((id) => emotionById(id))
+    .filter((m): m is NonNullable<typeof m> => Boolean(m));
   const dateStr = new Date(entry.created_at).toLocaleDateString("pt-BR");
 
   useEffect(() => {
@@ -75,8 +77,11 @@ export default function DeleteConfirm({ entry, onClose }: Props) {
           Deletar este registro?
         </h2>
         <p className="text-sm text-ink-400 font-display mb-1">
-          {meta?.emoji} <strong className="text-ink-500">{meta?.label}</strong> ·{" "}
-          {dateStr}
+          {metas.map((m) => m.emoji).join(" ")}{" "}
+          <strong className="text-ink-500">
+            {metas.map((m) => m.label).join(", ")}
+          </strong>{" "}
+          · {dateStr}
         </p>
         <p className="text-sm text-ink-400 font-display mb-5">
           Essa ação não pode ser desfeita.

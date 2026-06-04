@@ -8,7 +8,7 @@ interface Body {
   filename: string;
   pdfBase64: string;
   entry: {
-    emotion: string;
+    emotions: string[];
     intensity: number;
     created_at: string;
   };
@@ -51,7 +51,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Email inválido." }, { status: 400 });
   }
 
-  const meta = emotionById(entry.emotion);
+  const metas = entry.emotions
+    .map((id) => emotionById(id))
+    .filter((m): m is NonNullable<typeof m> => Boolean(m));
+  const emotionDisplay = metas.length
+    ? metas.map((m) => `${m.emoji} ${m.label}`).join(" · ")
+    : entry.emotions.join(", ");
   const date = new Date(entry.created_at).toLocaleDateString("pt-BR");
   const author = userName || user.email || "Alguém";
 
@@ -71,8 +76,9 @@ export async function POST(request: Request) {
           <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
             <p style="margin: 0 0 4px; font-size: 13px; color: #7A7470;">${escapeHtml(date)}</p>
             <p style="margin: 0; font-size: 16px;">
-              ${meta?.emoji ?? "💭"} <strong>${escapeHtml(meta?.label ?? entry.emotion)}</strong>
-              · Intensidade ${entry.intensity}/10
+              <strong>${escapeHtml(emotionDisplay)}</strong>
+              <br/>
+              <span style="font-size: 13px; color: #7A7470;">Intensidade ${entry.intensity}/10</span>
             </p>
           </div>
           <p style="margin: 0; font-size: 13px; color: #7A7470;">

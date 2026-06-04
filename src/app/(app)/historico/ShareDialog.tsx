@@ -57,7 +57,7 @@ export default function ShareDialog({
           filename,
           pdfBase64,
           entry: {
-            emotion: entry.emotion,
+            emotions: entry.emotions,
             intensity: entry.intensity,
             created_at: entry.created_at,
           },

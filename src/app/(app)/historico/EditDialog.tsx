@@ -16,8 +16,14 @@ export default function EditDialog({ entry, onClose }: Props) {
   const router = useRouter();
   const supabase = createClient();
 
-  const [emotion, setEmotion] = useState<Emotion>(entry.emotion);
+  const [emotions, setEmotions] = useState<Emotion[]>(entry.emotions);
   const [intensity, setIntensity] = useState(entry.intensity);
+
+  function toggleEmotion(id: Emotion) {
+    setEmotions((prev) =>
+      prev.includes(id) ? prev.filter((e) => e !== id) : [...prev, id],
+    );
+  }
   const [text, setText] = useState(entry.text ?? "");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -36,6 +42,10 @@ export default function EditDialog({ entry, onClose }: Props) {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    if (emotions.length === 0) {
+      setError("Escolha pelo menos uma emoção 💛");
+      return;
+    }
     setError(null);
     setSaving(true);
 
@@ -43,7 +53,7 @@ export default function EditDialog({ entry, onClose }: Props) {
       const { error } = await supabase
         .from("diary_entries")
         .update({
-          emotion,
+          emotions,
           intensity,
           text: text.trim() || null,
         })
@@ -85,17 +95,24 @@ export default function EditDialog({ entry, onClose }: Props) {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <p className="text-sm font-display font-semibold text-ink-500 mb-2">
-              Emoção
-            </p>
+            <div className="flex items-baseline justify-between mb-2">
+              <p className="text-sm font-display font-semibold text-ink-500">
+                Emoções
+              </p>
+              {emotions.length > 0 && (
+                <span className="text-xs font-display font-semibold text-blush-500">
+                  {emotions.length} selecionada{emotions.length > 1 ? "s" : ""}
+                </span>
+              )}
+            </div>
             <div className="grid grid-cols-4 gap-2">
               {EMOTIONS.map((e) => {
-                const selected = emotion === e.id;
+                const selected = emotions.includes(e.id);
                 return (
                   <button
                     key={e.id}
                     type="button"
-                    onClick={() => setEmotion(e.id)}
+                    onClick={() => toggleEmotion(e.id)}
                     className={`flex flex-col items-center gap-0.5 p-2 rounded-2xl transition ${
                       selected
                         ? `${e.bgClass} ring-4 ${e.ringClass} animate-pop`
