@@ -62,8 +62,8 @@ const config: Config = {
         "5xl": "2.5rem",
       },
       boxShadow: {
-        soft: "0 4px 20px -4px rgba(220, 110, 133, 0.15)",
-        "soft-lg": "0 10px 40px -10px rgba(220, 110, 133, 0.25)",
+        soft: "0 1px 3px 0 rgba(74, 68, 64, 0.04), 0 1px 2px 0 rgba(74, 68, 64, 0.03)",
+        "soft-lg": "0 4px 16px -4px rgba(74, 68, 64, 0.08)",
       },
       animation: {
         "fade-in": "fadeIn 0.4s ease-out",

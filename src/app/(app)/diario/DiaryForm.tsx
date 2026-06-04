@@ -121,7 +121,7 @@ export default function DiaryForm() {
           )}
         </div>
         <p className="text-xs text-ink-400 font-display mb-4">
-          Pode escolher quantas quiser.
+          Toque em todas que combinam com você agora.
         </p>
 
         <div className="grid grid-cols-4 gap-3">
@@ -134,8 +134,8 @@ export default function DiaryForm() {
                 onClick={() => toggleEmotion(e.id)}
                 className={`flex flex-col items-center gap-1 p-3 rounded-2xl transition ${
                   selected
-                    ? `${e.bgClass} ring-4 ${e.ringClass} animate-pop`
-                    : "bg-cream-200 hover:scale-105"
+                    ? `${e.bgClass} ring-2 ${e.ringClass} animate-pop`
+                    : "bg-cream-200/60 hover:bg-cream-200"
                 }`}
                 style={selected ? { color: "#4A4440" } : undefined}
               >
@@ -162,7 +162,7 @@ export default function DiaryForm() {
       >
         <div className="flex items-center justify-between mb-3">
           <h2 className="font-display font-bold text-lg">Intensidade</h2>
-          <span className="px-3 py-1 rounded-full bg-blush-100 text-blush-500 font-display font-semibold text-sm">
+          <span className="px-3 py-1 rounded-full bg-blush-100 text-blush-400 font-display font-semibold text-sm">
             {intensity} · {intensityLabel}
           </span>
         </div>

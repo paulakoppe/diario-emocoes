@@ -65,7 +65,7 @@ export default function DiaryEntryCard({ entry, onShare, onEdit, onDelete }: Pro
             <h3 className="font-display font-bold text-ink-600">
               {labels || "Emoção"}
             </h3>
-            <span className="text-xs font-display text-blush-500 bg-blush-100 px-2 py-0.5 rounded-full">
+            <span className="text-xs font-display text-blush-400 bg-blush-100 px-2 py-0.5 rounded-full">
               Intensidade {entry.intensity}/10
             </span>
           </div>

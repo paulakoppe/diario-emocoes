@@ -121,8 +121,8 @@ export default function EditDialog({ entry, onClose }: Props) {
                     onClick={() => toggleEmotion(e.id)}
                     className={`flex flex-col items-center gap-0.5 p-2 rounded-2xl transition ${
                       selected
-                        ? `${e.bgClass} ring-4 ${e.ringClass} animate-pop`
-                        : "bg-cream-200 hover:scale-105"
+                        ? `${e.bgClass} ring-2 ${e.ringClass} animate-pop`
+                        : "bg-cream-200/60 hover:bg-cream-200"
                     }`}
                     style={selected ? { color: "#4A4440" } : undefined}
                   >

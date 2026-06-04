@@ -15,7 +15,7 @@ export default function BottomNav() {
 
   return (
     <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 z-30 w-[calc(100%-2rem)] max-w-md">
-      <div className="bg-white dark:bg-[rgb(44,38,48)] rounded-full shadow-soft-lg px-2 py-2 flex items-center justify-around border border-blush-100 dark:border-blush-400/20">
+      <div className="bg-white dark:bg-[rgb(44,38,48)] rounded-full shadow-soft px-2 py-2 flex items-center justify-around border border-[rgb(var(--border-soft))]">
         {TABS.map(({ href, label, icon: Icon }) => {
           const active = pathname.startsWith(href);
           return (

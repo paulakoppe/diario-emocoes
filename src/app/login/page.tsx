@@ -86,16 +86,17 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4 py-10 bg-gradient-to-b from-cream-100 via-blush-100 to-lavender-100 dark:from-[rgb(30,26,32)] dark:via-[rgb(40,28,46)] dark:to-[rgb(50,30,62)]">
+    <main className="min-h-screen flex items-center justify-center px-4 py-10 bg-cream-100 dark:bg-[rgb(30,26,32)]">
       <div className="w-full max-w-md animate-slide-up">
-        <div className="text-center mb-8">
-          <div className="inline-flex w-20 h-20 items-center justify-center rounded-full bg-white shadow-soft mb-4">
-            <Heart className="w-10 h-10 text-blush-400" fill="currentColor" />
-          </div>
-          <h1 className="text-3xl font-display font-bold text-ink-600">
+        <div className="text-center mb-10">
+          <Heart
+            className="w-8 h-8 text-blush-300 mx-auto mb-4"
+            fill="currentColor"
+          />
+          <h1 className="text-2xl font-display font-bold text-ink-600">
             Diário de Emoções
           </h1>
-          <p className="text-ink-400 mt-2 font-display">
+          <p className="text-ink-400 mt-1 text-sm font-display">
             Um espaço só seu.
           </p>
         </div>
