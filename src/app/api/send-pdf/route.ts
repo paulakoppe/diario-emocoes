@@ -57,7 +57,18 @@ export async function POST(request: Request) {
   const emotionDisplay = metas.length
     ? metas.map((m) => `${m.emoji} ${m.label}`).join(" · ")
     : entry.emotions.join(", ");
-  const date = new Date(entry.created_at).toLocaleDateString("pt-BR");
+  // Força timezone de São Paulo — servidor da Vercel roda em UTC
+  const date = new Date(entry.created_at).toLocaleDateString("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+  const time = new Date(entry.created_at).toLocaleTimeString("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
   const author = userName || user.email || "Alguém";
 
   const resend = new Resend(apiKey);
@@ -74,11 +85,12 @@ export async function POST(request: Request) {
             <strong>${escapeHtml(author)}</strong> compartilhou um registro com você.
           </p>
           <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
-            <p style="margin: 0 0 4px; font-size: 13px; color: #7A7470;">${escapeHtml(date)}</p>
-            <p style="margin: 0; font-size: 16px;">
+            <p style="margin: 0 0 6px; font-size: 13px; color: #7A7470;">${escapeHtml(date)} · ${escapeHtml(time)}</p>
+            <p style="margin: 0; font-size: 16px; line-height: 1.5;">
               <strong>${escapeHtml(emotionDisplay)}</strong>
-              <br/>
-              <span style="font-size: 13px; color: #7A7470;">Intensidade ${entry.intensity}/10</span>
+            </p>
+            <p style="margin: 6px 0 0; font-size: 13px; color: #7A7470;">
+              Intensidade ${entry.intensity}/10
             </p>
           </div>
           <p style="margin: 0; font-size: 13px; color: #7A7470;">
