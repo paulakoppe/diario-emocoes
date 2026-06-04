@@ -112,7 +112,7 @@ export default function DiaryForm() {
       <section className="card">
         <div className="flex items-baseline justify-between mb-1">
           <h2 className="font-display font-bold text-lg">
-            Que emoções são essas?
+            Suas emoções
           </h2>
           {emotions.length > 0 && (
             <span className="text-xs font-display font-semibold text-blush-500">

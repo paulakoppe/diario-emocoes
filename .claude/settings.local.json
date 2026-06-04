@@ -20,7 +20,8 @@
       "Bash(git commit -m 'fix: resiliencia para schema antigo \\(emotion\\) e novo \\(emotions\\) *)",
       "Bash(git commit -m 'fix: gradiente do fundo do login agora adapta a dark mode *)",
       "Bash(git commit -m 'tone: escrita mais seca, menos emoji decorativo; sol/lua na saudacao *)",
-      "Bash(git commit -m 'style: visual mais minimalista e cores mais suaves *)"
+      "Bash(git commit -m 'style: visual mais minimalista e cores mais suaves *)",
+      "Bash(git commit -m 'copy: troca '\\\\''Que emocoes sao essas?'\\\\'' por '\\\\''Suas emocoes'\\\\'' *)"
     ]
   }
 }
