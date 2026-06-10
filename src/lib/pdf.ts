@@ -7,8 +7,7 @@ export interface PdfMeta {
   userEmail?: string | null;
 }
 
-export function buildEntryPdf(entry: DiaryEntry, meta: PdfMeta): jsPDF {
-  const doc = new jsPDF({ unit: "pt", format: "a4" });
+function drawEntryOnDoc(doc: jsPDF, entry: DiaryEntry, meta: PdfMeta) {
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 56;
 
@@ -67,11 +66,41 @@ export function buildEntryPdf(entry: DiaryEntry, meta: PdfMeta): jsPDF {
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(14);
-  const emotionLabel = metas.length
-    ? metas.map((m) => `${m.emoji}  ${m.label}`).join("    ")
-    : emotionIds.join(", ");
-  const emotionLines = doc.splitTextToSize(emotionLabel, pageWidth - margin * 2);
-  doc.text(emotionLines, margin, 196);
+  doc.setTextColor(74, 68, 64);
+
+  if (metas.length) {
+    const circleR = 6;
+    const labelGap = 10;
+    const itemGap = 24;
+    const lineHeight = 26;
+    const baselineY = 196;
+    const maxX = pageWidth - margin;
+
+    let x = margin;
+    let y = baselineY;
+
+    metas.forEach((m) => {
+      const labelW = doc.getTextWidth(m.label);
+      const itemW = circleR * 2 + labelGap + labelW;
+
+      if (x + itemW > maxX && x > margin) {
+        x = margin;
+        y += lineHeight;
+      }
+
+      const [r, g, b] = m.pdfColor;
+      doc.setFillColor(r, g, b);
+      doc.circle(x + circleR, y - 4, circleR, "F");
+
+      doc.text(m.label, x + circleR * 2 + labelGap, y);
+
+      x += itemW + itemGap;
+    });
+  } else {
+    const fallback = emotionIds.join(", ");
+    const lines = doc.splitTextToSize(fallback, pageWidth - margin * 2);
+    doc.text(lines, margin, 196);
+  }
 
   // Intensidade
   doc.setFont("helvetica", "bold");
@@ -114,7 +143,20 @@ export function buildEntryPdf(entry: DiaryEntry, meta: PdfMeta): jsPDF {
     doc.internal.pageSize.getHeight() - 30,
     { align: "center" },
   );
+}
 
+export function buildEntryPdf(entry: DiaryEntry, meta: PdfMeta): jsPDF {
+  const doc = new jsPDF({ unit: "pt", format: "a4" });
+  drawEntryOnDoc(doc, entry, meta);
+  return doc;
+}
+
+export function buildEntriesPdf(entries: DiaryEntry[], meta: PdfMeta): jsPDF {
+  const doc = new jsPDF({ unit: "pt", format: "a4" });
+  entries.forEach((entry, i) => {
+    if (i > 0) doc.addPage();
+    drawEntryOnDoc(doc, entry, meta);
+  });
   return doc;
 }
 

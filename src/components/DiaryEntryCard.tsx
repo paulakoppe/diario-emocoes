@@ -1,17 +1,28 @@
 "use client";
 
-import { Send, Pencil, Trash2 } from "lucide-react";
+import { Send, Pencil, Trash2, Check } from "lucide-react";
 import { emotionById, getEntryEmotions } from "@/lib/emotions";
 import type { DiaryEntry } from "@/types/database.types";
 
 interface Props {
   entry: DiaryEntry;
-  onShare: () => void;
+  onShare?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
+  selectable?: boolean;
+  selected?: boolean;
+  onToggleSelect?: () => void;
 }
 
-export default function DiaryEntryCard({ entry, onShare, onEdit, onDelete }: Props) {
+export default function DiaryEntryCard({
+  entry,
+  onShare,
+  onEdit,
+  onDelete,
+  selectable = false,
+  selected = false,
+  onToggleSelect,
+}: Props) {
   const date = new Date(entry.created_at);
   const dateStr = date.toLocaleDateString("pt-BR", {
     day: "2-digit",
@@ -30,8 +41,23 @@ export default function DiaryEntryCard({ entry, onShare, onEdit, onDelete }: Pro
   const labels = metas.map((m) => m.label).join(", ");
   const firstBg = metas[0]?.bgClass ?? "bg-cream-200";
 
+  const cardClasses = [
+    "card animate-fade-in",
+    selectable ? "cursor-pointer transition" : "",
+    selectable && selected
+      ? "ring-2 ring-blush-400 bg-blush-100/40 dark:bg-blush-400/10"
+      : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <article className="card animate-fade-in">
+    <article
+      className={cardClasses}
+      onClick={selectable ? onToggleSelect : undefined}
+      role={selectable ? "button" : undefined}
+      aria-pressed={selectable ? selected : undefined}
+    >
       <header className="flex items-start gap-3 mb-3">
         <div className="shrink-0">
           {metas.length === 1 ? (
@@ -73,6 +99,19 @@ export default function DiaryEntryCard({ entry, onShare, onEdit, onDelete }: Pro
             {dateStr} · {timeStr}
           </p>
         </div>
+
+        {selectable && (
+          <div
+            className={`shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition border-2 ${
+              selected
+                ? "bg-blush-400 border-blush-400 text-white"
+                : "border-ink-400/40 dark:border-[rgb(188,178,184)]/40"
+            }`}
+            aria-hidden
+          >
+            {selected && <Check className="w-4 h-4" strokeWidth={3} />}
+          </div>
+        )}
       </header>
 
       {entry.text && (
@@ -81,39 +120,43 @@ export default function DiaryEntryCard({ entry, onShare, onEdit, onDelete }: Pro
         </p>
       )}
 
-      <div className="flex items-center gap-1 -mb-2 -mr-2 justify-end">
-        {onEdit && (
-          <button
-            type="button"
-            onClick={onEdit}
-            className="btn-icon text-ink-400 hover:bg-cream-200 hover:text-lavender-400"
-            aria-label="Editar"
-            title="Editar entrada"
-          >
-            <Pencil className="w-4 h-4" />
-          </button>
-        )}
-        {onDelete && (
-          <button
-            type="button"
-            onClick={onDelete}
-            className="btn-icon text-ink-400 hover:bg-blush-100 hover:text-blush-500"
-            aria-label="Deletar"
-            title="Deletar entrada"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
-        )}
-        <button
-          type="button"
-          onClick={onShare}
-          className="btn-icon bg-blush-100 text-blush-500 hover:bg-blush-200"
-          aria-label="Compartilhar como PDF"
-          title="Enviar por email como PDF"
-        >
-          <Send className="w-4 h-4" />
-        </button>
-      </div>
+      {!selectable && (
+        <div className="flex items-center gap-1 -mb-2 -mr-2 justify-end">
+          {onEdit && (
+            <button
+              type="button"
+              onClick={onEdit}
+              className="btn-icon text-ink-400 hover:bg-cream-200 hover:text-lavender-400"
+              aria-label="Editar"
+              title="Editar entrada"
+            >
+              <Pencil className="w-4 h-4" />
+            </button>
+          )}
+          {onDelete && (
+            <button
+              type="button"
+              onClick={onDelete}
+              className="btn-icon text-ink-400 hover:bg-blush-100 hover:text-blush-500"
+              aria-label="Deletar"
+              title="Deletar entrada"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          )}
+          {onShare && (
+            <button
+              type="button"
+              onClick={onShare}
+              className="btn-icon bg-blush-100 text-blush-500 hover:bg-blush-200"
+              aria-label="Compartilhar como PDF"
+              title="Enviar por email como PDF"
+            >
+              <Send className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+      )}
     </article>
   );
 }

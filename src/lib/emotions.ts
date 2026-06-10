@@ -8,6 +8,8 @@ export interface EmotionMeta {
   bgClass: string;
   ringClass: string;
   textClass: string;
+  /** RGB usado no PDF (jsPDF não renderiza emoji Unicode). */
+  pdfColor: [number, number, number];
 }
 
 export const EMOTIONS: EmotionMeta[] = [
@@ -19,6 +21,7 @@ export const EMOTIONS: EmotionMeta[] = [
     bgClass: "bg-butter-200",
     ringClass: "ring-butter-300",
     textClass: "text-ink-600",
+    pdfColor: [255, 220, 133],
   },
   {
     id: "grato",
@@ -28,6 +31,7 @@ export const EMOTIONS: EmotionMeta[] = [
     bgClass: "bg-blush-200",
     ringClass: "ring-blush-400",
     textClass: "text-ink-600",
+    pdfColor: [236, 145, 164],
   },
   {
     id: "calmo",
@@ -37,6 +41,7 @@ export const EMOTIONS: EmotionMeta[] = [
     bgClass: "bg-mint-200",
     ringClass: "ring-mint-400",
     textClass: "text-ink-600",
+    pdfColor: [143, 204, 182],
   },
   {
     id: "animado",
@@ -46,6 +51,7 @@ export const EMOTIONS: EmotionMeta[] = [
     bgClass: "bg-lavender-200",
     ringClass: "ring-lavender-400",
     textClass: "text-ink-600",
+    pdfColor: [185, 127, 209],
   },
   {
     id: "triste",
@@ -55,6 +61,7 @@ export const EMOTIONS: EmotionMeta[] = [
     bgClass: "bg-blue-100",
     ringClass: "ring-blue-300",
     textClass: "text-ink-600",
+    pdfColor: [147, 197, 253],
   },
   {
     id: "ansioso",
@@ -64,6 +71,7 @@ export const EMOTIONS: EmotionMeta[] = [
     bgClass: "bg-purple-100",
     ringClass: "ring-purple-300",
     textClass: "text-ink-600",
+    pdfColor: [216, 180, 254],
   },
   {
     id: "irritado",
@@ -73,6 +81,7 @@ export const EMOTIONS: EmotionMeta[] = [
     bgClass: "bg-red-100",
     ringClass: "ring-red-300",
     textClass: "text-ink-600",
+    pdfColor: [252, 165, 165],
   },
   {
     id: "cansado",
@@ -82,6 +91,7 @@ export const EMOTIONS: EmotionMeta[] = [
     bgClass: "bg-gray-100",
     ringClass: "ring-gray-300",
     textClass: "text-ink-600",
+    pdfColor: [209, 213, 219],
   },
 ];
 

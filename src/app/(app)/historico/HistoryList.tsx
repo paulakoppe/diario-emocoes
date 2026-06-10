@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { BookHeart } from "lucide-react";
+import { useMemo, useState } from "react";
+import { BookHeart, CheckSquare, X, Send } from "lucide-react";
 import DiaryEntryCard from "@/components/DiaryEntryCard";
 import ShareDialog from "./ShareDialog";
 import EditDialog from "./EditDialog";
@@ -21,6 +21,45 @@ export default function HistoryList({ entries, userName, userEmail }: Props) {
     null,
   );
 
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkShareOpen, setBulkShareOpen] = useState(false);
+
+  const selectedEntries = useMemo(
+    () => entries.filter((e) => selectedIds.has(e.id)),
+    [entries, selectedIds],
+  );
+
+  const allSelected =
+    entries.length > 0 && selectedIds.size === entries.length;
+
+  function toggleSelect(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function enterSelectMode() {
+    setSelectMode(true);
+    setSelectedIds(new Set());
+  }
+
+  function exitSelectMode() {
+    setSelectMode(false);
+    setSelectedIds(new Set());
+  }
+
+  function toggleAll() {
+    if (allSelected) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(entries.map((e) => e.id)));
+    }
+  }
+
   if (entries.length === 0) {
     return (
       <div className="card text-center py-12">
@@ -39,6 +78,40 @@ export default function HistoryList({ entries, userName, userEmail }: Props) {
 
   return (
     <>
+      <div className="flex items-center justify-between mb-3 px-1 min-h-[2.5rem] gap-2">
+        {selectMode ? (
+          <>
+            <button
+              type="button"
+              onClick={exitSelectMode}
+              className="inline-flex items-center gap-1 text-sm font-display font-semibold text-ink-500 hover:text-blush-500 transition"
+            >
+              <X className="w-4 h-4" />
+              Cancelar
+            </button>
+            <span className="text-sm font-display text-soft">
+              {selectedIds.size} selecionado{selectedIds.size === 1 ? "" : "s"}
+            </span>
+            <button
+              type="button"
+              onClick={toggleAll}
+              className="text-sm font-display font-semibold text-blush-500 hover:text-blush-400 transition"
+            >
+              {allSelected ? "Limpar" : "Selecionar tudo"}
+            </button>
+          </>
+        ) : (
+          <button
+            type="button"
+            onClick={enterSelectMode}
+            className="inline-flex items-center gap-2 rounded-full bg-blush-400 text-white px-4 py-2 font-display font-semibold text-sm shadow-soft hover:bg-blush-500 active:scale-95 transition"
+          >
+            <CheckSquare className="w-4 h-4" />
+            Selecionar vários para envio
+          </button>
+        )}
+      </div>
+
       <div className="space-y-3">
         {entries.map((entry) => (
           <DiaryEntryCard
@@ -47,13 +120,33 @@ export default function HistoryList({ entries, userName, userEmail }: Props) {
             onShare={() => setActive({ entry, action: "share" })}
             onEdit={() => setActive({ entry, action: "edit" })}
             onDelete={() => setActive({ entry, action: "delete" })}
+            selectable={selectMode}
+            selected={selectedIds.has(entry.id)}
+            onToggleSelect={() => toggleSelect(entry.id)}
           />
         ))}
       </div>
 
+      <p className="text-xs font-display text-soft text-right mt-4 pr-1">
+        {entries.length} registro{entries.length === 1 ? "" : "s"}
+      </p>
+
+      {selectMode && selectedIds.size > 0 && (
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-2rem)] max-w-md animate-slide-up">
+          <button
+            type="button"
+            onClick={() => setBulkShareOpen(true)}
+            className="btn-primary w-full shadow-soft-lg"
+          >
+            <Send className="w-4 h-4" />
+            Enviar selecionados ({selectedIds.size})
+          </button>
+        </div>
+      )}
+
       {active?.action === "share" && (
         <ShareDialog
-          entry={active.entry}
+          entries={[active.entry]}
           defaultEmail={userEmail ?? ""}
           userName={userName}
           userEmail={userEmail}
@@ -67,6 +160,19 @@ export default function HistoryList({ entries, userName, userEmail }: Props) {
 
       {active?.action === "delete" && (
         <DeleteConfirm entry={active.entry} onClose={() => setActive(null)} />
+      )}
+
+      {bulkShareOpen && selectedEntries.length > 0 && (
+        <ShareDialog
+          entries={selectedEntries}
+          defaultEmail={userEmail ?? ""}
+          userName={userName}
+          userEmail={userEmail}
+          onClose={() => {
+            setBulkShareOpen(false);
+            exitSelectMode();
+          }}
+        />
       )}
     </>
   );

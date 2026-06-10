@@ -3,16 +3,43 @@ import { Resend } from "resend";
 import { createClient } from "@/lib/supabase/server";
 import { emotionById } from "@/lib/emotions";
 
+interface EntryPayload {
+  emotions: string[];
+  intensity: number;
+  created_at: string;
+}
+
 interface Body {
   to: string;
   filename: string;
   pdfBase64: string;
-  entry: {
-    emotions: string[];
-    intensity: number;
-    created_at: string;
-  };
+  entries?: EntryPayload[];
+  entry?: EntryPayload; // retrocompat com chamadas antigas
   userName: string | null;
+}
+
+function formatEmotions(emotions: string[]): string {
+  const metas = emotions
+    .map((id) => emotionById(id))
+    .filter((m): m is NonNullable<typeof m> => Boolean(m));
+  return metas.length
+    ? metas.map((m) => `${m.emoji} ${m.label}`).join(" · ")
+    : emotions.join(", ");
+}
+
+function formatDateTime(iso: string): { date: string; time: string } {
+  const date = new Date(iso).toLocaleDateString("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+  const time = new Date(iso).toLocaleTimeString("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  return { date, time };
 }
 
 export async function POST(request: Request) {
@@ -40,9 +67,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "JSON inválido." }, { status: 400 });
   }
 
-  const { to, filename, pdfBase64, entry, userName } = body;
+  const { to, filename, pdfBase64, entries, entry, userName } = body;
 
-  if (!to || !filename || !pdfBase64 || !entry) {
+  // Aceita tanto `entries` (novo) quanto `entry` (retrocompat)
+  const entryList: EntryPayload[] = Array.isArray(entries) && entries.length
+    ? entries
+    : entry
+      ? [entry]
+      : [];
+
+  if (!to || !filename || !pdfBase64 || entryList.length === 0) {
     return NextResponse.json({ error: "Dados incompletos." }, { status: 400 });
   }
 
@@ -51,25 +85,60 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Email inválido." }, { status: 400 });
   }
 
-  const metas = entry.emotions
-    .map((id) => emotionById(id))
-    .filter((m): m is NonNullable<typeof m> => Boolean(m));
-  const emotionDisplay = metas.length
-    ? metas.map((m) => `${m.emoji} ${m.label}`).join(" · ")
-    : entry.emotions.join(", ");
-  // Força timezone de São Paulo — servidor da Vercel roda em UTC
-  const date = new Date(entry.created_at).toLocaleDateString("pt-BR", {
-    timeZone: "America/Sao_Paulo",
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
-  const time = new Date(entry.created_at).toLocaleTimeString("pt-BR", {
-    timeZone: "America/Sao_Paulo",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
   const author = userName || user.email || "Alguém";
+  const isMulti = entryList.length > 1;
+
+  const subject = isMulti
+    ? `${author} compartilhou ${entryList.length} registros do diário`
+    : `${author} compartilhou um registro do diário`;
+
+  let entriesHtml: string;
+  if (isMulti) {
+    const rows = entryList
+      .map((e) => {
+        const { date, time } = formatDateTime(e.created_at);
+        const emoLabel = formatEmotions(e.emotions);
+        return `
+          <div style="background: white; border-radius: 12px; padding: 12px 16px; margin-bottom: 8px;">
+            <p style="margin: 0 0 4px; font-size: 12px; color: #7A7470;">${escapeHtml(date)} · ${escapeHtml(time)}</p>
+            <p style="margin: 0; font-size: 14px; line-height: 1.4;">
+              <strong>${escapeHtml(emoLabel)}</strong>
+              <span style="color: #7A7470; font-weight: normal;"> — intensidade ${e.intensity}/10</span>
+            </p>
+          </div>
+        `;
+      })
+      .join("");
+    entriesHtml = `
+      <p style="margin: 0 0 12px; font-size: 13px; color: #7A7470;">
+        ${entryList.length} registros incluídos:
+      </p>
+      ${rows}
+    `;
+  } else {
+    const e = entryList[0];
+    const { date, time } = formatDateTime(e.created_at);
+    const emoLabel = formatEmotions(e.emotions);
+    entriesHtml = `
+      <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+        <p style="margin: 0 0 6px; font-size: 13px; color: #7A7470;">${escapeHtml(date)} · ${escapeHtml(time)}</p>
+        <p style="margin: 0; font-size: 16px; line-height: 1.5;">
+          <strong>${escapeHtml(emoLabel)}</strong>
+        </p>
+        <p style="margin: 6px 0 0; font-size: 13px; color: #7A7470;">
+          Intensidade ${e.intensity}/10
+        </p>
+      </div>
+    `;
+  }
+
+  const intro = isMulti
+    ? `<strong>${escapeHtml(author)}</strong> compartilhou ${entryList.length} registros com você.`
+    : `<strong>${escapeHtml(author)}</strong> compartilhou um registro com você.`;
+
+  const footer = isMulti
+    ? "Os registros completos estão no PDF em anexo (um por página)."
+    : "O registro completo está no PDF em anexo.";
 
   const resend = new Resend(apiKey);
 
@@ -77,24 +146,16 @@ export async function POST(request: Request) {
     const { error } = await resend.emails.send({
       from: process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev",
       to,
-      subject: `${author} compartilhou um registro do diário`,
+      subject,
       html: `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 480px; margin: 0 auto; padding: 24px; background: #FFF8F3; border-radius: 16px; color: #4A4440;">
           <h1 style="margin: 0 0 8px; color: #DC6E85; font-size: 22px;">Diário de Emoções</h1>
           <p style="margin: 0 0 16px; color: #7A7470; font-size: 14px;">
-            <strong>${escapeHtml(author)}</strong> compartilhou um registro com você.
+            ${intro}
           </p>
-          <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
-            <p style="margin: 0 0 6px; font-size: 13px; color: #7A7470;">${escapeHtml(date)} · ${escapeHtml(time)}</p>
-            <p style="margin: 0; font-size: 16px; line-height: 1.5;">
-              <strong>${escapeHtml(emotionDisplay)}</strong>
-            </p>
-            <p style="margin: 6px 0 0; font-size: 13px; color: #7A7470;">
-              Intensidade ${entry.intensity}/10
-            </p>
-          </div>
+          ${entriesHtml}
           <p style="margin: 0; font-size: 13px; color: #7A7470;">
-            O registro completo está no PDF em anexo.
+            ${footer}
           </p>
         </div>
       `,

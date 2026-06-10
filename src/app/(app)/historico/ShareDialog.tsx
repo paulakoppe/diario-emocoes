@@ -2,19 +2,27 @@
 
 import { useState, useEffect, type FormEvent } from "react";
 import { X, Mail, Download, Send, Check, Loader2 } from "lucide-react";
-import { buildEntryPdf, pdfToBase64, downloadPdf } from "@/lib/pdf";
+import { buildEntriesPdf, pdfToBase64, downloadPdf } from "@/lib/pdf";
 import type { DiaryEntry } from "@/types/database.types";
 
 interface Props {
-  entry: DiaryEntry;
+  entries: DiaryEntry[];
   defaultEmail: string;
   userName: string | null;
   userEmail: string | null;
   onClose: () => void;
 }
 
+function buildFilename(entries: DiaryEntry[]): string {
+  if (entries.length === 1) {
+    return `diario-${entries[0].created_at.slice(0, 10)}.pdf`;
+  }
+  const today = new Date().toISOString().slice(0, 10);
+  return `diario-${entries.length}-registros-${today}.pdf`;
+}
+
 export default function ShareDialog({
-  entry,
+  entries,
   defaultEmail,
   userName,
   userEmail,
@@ -25,6 +33,9 @@ export default function ShareDialog({
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const count = entries.length;
+  const isMulti = count > 1;
+
   useEffect(() => {
     function onEsc(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
@@ -34,9 +45,8 @@ export default function ShareDialog({
   }, [onClose]);
 
   function handleDownload() {
-    const doc = buildEntryPdf(entry, { userName, userEmail });
-    const filename = `diario-${entry.created_at.slice(0, 10)}.pdf`;
-    downloadPdf(doc, filename);
+    const doc = buildEntriesPdf(entries, { userName, userEmail });
+    downloadPdf(doc, buildFilename(entries));
   }
 
   async function handleSend(e: FormEvent) {
@@ -45,9 +55,19 @@ export default function ShareDialog({
     setSending(true);
 
     try {
-      const doc = buildEntryPdf(entry, { userName, userEmail });
+      const doc = buildEntriesPdf(entries, { userName, userEmail });
       const pdfBase64 = pdfToBase64(doc);
-      const filename = `diario-${entry.created_at.slice(0, 10)}.pdf`;
+      const filename = buildFilename(entries);
+
+      const payloadEntries = entries.map((entry) => ({
+        emotions: Array.isArray(entry.emotions)
+          ? entry.emotions
+          : (entry as unknown as { emotion?: string }).emotion
+            ? [(entry as unknown as { emotion: string }).emotion]
+            : [],
+        intensity: entry.intensity,
+        created_at: entry.created_at,
+      }));
 
       const res = await fetch("/api/send-pdf", {
         method: "POST",
@@ -56,16 +76,7 @@ export default function ShareDialog({
           to,
           filename,
           pdfBase64,
-          entry: {
-            // Fallback resiliente caso schema antigo ainda exista
-            emotions: Array.isArray(entry.emotions)
-              ? entry.emotions
-              : (entry as unknown as { emotion?: string }).emotion
-                ? [(entry as unknown as { emotion: string }).emotion]
-                : [],
-            intensity: entry.intensity,
-            created_at: entry.created_at,
-          },
+          entries: payloadEntries,
           userName,
         }),
       });
@@ -84,6 +95,13 @@ export default function ShareDialog({
     }
   }
 
+  const title = isMulti
+    ? `Compartilhar ${count} registros como PDF`
+    : "Compartilhar como PDF";
+  const intro = isMulti
+    ? `Vamos gerar um PDF único com ${count} registros (um por página) e enviar para o email que você quiser.`
+    : "Vamos gerar um PDF deste registro e enviar para o email que você quiser.";
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-ink-600/40 backdrop-blur-sm p-4 animate-fade-in"
@@ -93,9 +111,7 @@ export default function ShareDialog({
     >
       <div className="w-full max-w-md bg-white rounded-3xl shadow-soft-lg p-6 animate-slide-up">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-display font-bold text-xl">
-            Compartilhar como PDF
-          </h2>
+          <h2 className="font-display font-bold text-xl">{title}</h2>
           <button
             type="button"
             onClick={onClose}
@@ -106,9 +122,7 @@ export default function ShareDialog({
           </button>
         </div>
 
-        <p className="text-sm text-ink-400 font-display mb-4">
-          Vamos gerar um PDF deste registro e enviar para o email que você quiser.
-        </p>
+        <p className="text-sm text-ink-400 font-display mb-4">{intro}</p>
 
         <button
           type="button"
@@ -116,7 +130,7 @@ export default function ShareDialog({
           className="btn-secondary w-full mb-4"
         >
           <Download className="w-4 h-4" />
-          Só baixar o PDF
+          {isMulti ? "Só baixar o PDF combinado" : "Só baixar o PDF"}
         </button>
 
         <div className="text-center text-xs font-display text-ink-400 mb-3">
@@ -162,7 +176,8 @@ export default function ShareDialog({
               </>
             ) : (
               <>
-                <Send className="w-4 h-4" /> Enviar por email
+                <Send className="w-4 h-4" />{" "}
+                {isMulti ? `Enviar ${count} registros` : "Enviar por email"}
               </>
             )}
           </button>
