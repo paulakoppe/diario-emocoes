@@ -93,6 +93,16 @@ export const EMOTIONS: EmotionMeta[] = [
     textClass: "text-ink-600",
     pdfColor: [209, 213, 219],
   },
+  {
+    id: "apatico",
+    label: "Apatia",
+    emoji: "😶",
+    tone: "negative",
+    bgClass: "bg-slate-100",
+    ringClass: "ring-slate-300",
+    textClass: "text-ink-600",
+    pdfColor: [203, 213, 225],
+  },
 ];
 
 export const emotionById = (id: string): EmotionMeta | undefined =>

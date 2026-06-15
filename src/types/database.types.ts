@@ -6,7 +6,8 @@ export type Emotion =
   | "triste"
   | "ansioso"
   | "irritado"
-  | "cansado";
+  | "cansado"
+  | "apatico";
 
 export interface Profile {
   id: string;

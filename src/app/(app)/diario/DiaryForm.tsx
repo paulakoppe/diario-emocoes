@@ -124,7 +124,7 @@ export default function DiaryForm() {
           Toque em todas que combinam com você agora.
         </p>
 
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-3 gap-3">
           {EMOTIONS.map((e) => {
             const selected = emotions.includes(e.id);
             return (

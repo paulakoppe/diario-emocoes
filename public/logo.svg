@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Diário de Emoções">
+  <title>Diário de Emoções</title>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F4B6C2"/>
+      <stop offset="100%" stop-color="#D87C90"/>
+    </linearGradient>
+    <clipPath id="rounded">
+      <rect width="512" height="512" rx="100" ry="100"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#rounded)">
+    <rect width="512" height="512" fill="url(#bg)"/>
+    <circle cx="90" cy="100" r="55" fill="#ffffff" fill-opacity="0.18"/>
+    <circle cx="400" cy="395" r="40" fill="#ffffff" fill-opacity="0.18"/>
+    <path d="M256 190 C256 140 195 100 140 140 C85 180 85 250 256 395 C427 250 427 180 372 140 C317 100 256 140 256 190 Z" fill="#ffffff"/>
+  </g>
+</svg>
