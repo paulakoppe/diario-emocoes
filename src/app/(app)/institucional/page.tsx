@@ -123,10 +123,10 @@ export default function InstitucionalPage() {
             <p>
               Para dúvidas, solicitações de LGPD ou suporte, escreva para{" "}
               <a
-                href="mailto:paula.c.koppe@gmail.com"
+                href="mailto:contato@diariodeemocoes.xyz"
                 className="text-blush-500 hover:underline"
               >
-                paula.c.koppe@gmail.com
+                contato@diariodeemocoes.xyz
               </a>
               .
             </p>

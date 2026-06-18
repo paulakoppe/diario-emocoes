@@ -56,16 +56,22 @@ export default function EditDialog({ entry, onClose }: Props) {
     setSaving(true);
 
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from("diary_entries")
         .update({
           emotions,
           intensity,
           text: text.trim() || null,
         })
-        .eq("id", entry.id);
+        .eq("id", entry.id)
+        .select();
 
       if (error) throw error;
+      if (!data || data.length === 0) {
+        throw new Error(
+          "Nada foi atualizado. Verifique se a policy de UPDATE está ativa no Supabase (migration 001_add_update_policy.sql).",
+        );
+      }
 
       setSaved(true);
       setTimeout(() => {
