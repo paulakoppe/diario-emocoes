@@ -72,7 +72,7 @@ export default function ApoioPage() {
             <div className="relative w-20 h-20 rounded-full overflow-hidden shrink-0 ring-2 ring-mint-200">
               <Image
                 src="/team/carol.jpg"
-                alt="Carol"
+                alt="Carol Pego"
                 fill
                 sizes="80px"
                 className="object-cover"
@@ -81,7 +81,7 @@ export default function ApoioPage() {
             </div>
             <div className="min-w-0">
               <h2 className="font-display font-bold text-lg leading-tight">
-                Carol
+                Carol Pego
               </h2>
               <p className="text-xs font-display text-soft mt-0.5">
                 Psicóloga humanista · CRP 08/43368
@@ -91,10 +91,11 @@ export default function ApoioPage() {
 
           <div className="space-y-3 text-sm font-display text-soft leading-relaxed mb-4">
             <p>
-              Oi, eu sou a Carol! Sou psicóloga humanista e atuo na clínica
-              online. Mas, para além do CRP, sou uma pessoa comum, que
-              acredita profundamente que a psicologia acontece, de verdade,
-              no olho no olho.
+              Oi, eu sou a Carol! Sou psicóloga humanista e atuo pela
+              abordagem centrada na pessoa (ACP), na clínica online. Mas,
+              para além do CRP, sou uma pessoa comum, que acredita
+              profundamente que a psicologia acontece, de verdade, no
+              olho no olho.
             </p>
             <p>
               Acredito que é na relação autêntica entre terapeuta e cliente
