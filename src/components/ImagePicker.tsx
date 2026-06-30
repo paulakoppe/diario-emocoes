@@ -12,7 +12,45 @@ interface Props {
   maxImages?: number;
 }
 
-const MAX_SIZE_MB = 5;
+const HARD_LIMIT_MB = 25; // Limite absoluto antes mesmo de tentar comprimir
+const COMPRESS_THRESHOLD_BYTES = 800 * 1024; // Comprime tudo acima de 800KB
+const MAX_DIMENSION = 1600;
+const JPEG_QUALITY = 0.85;
+
+async function compressImage(file: File): Promise<File> {
+  // Pequena ou tipo não-imagem padrão: passa direto
+  if (file.size <= COMPRESS_THRESHOLD_BYTES) return file;
+  if (!file.type.startsWith("image/")) return file;
+
+  try {
+    const bitmap = await createImageBitmap(file);
+    const ratio = Math.min(
+      MAX_DIMENSION / bitmap.width,
+      MAX_DIMENSION / bitmap.height,
+      1,
+    );
+    const width = Math.round(bitmap.width * ratio);
+    const height = Math.round(bitmap.height * ratio);
+
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return file;
+    ctx.drawImage(bitmap, 0, 0, width, height);
+    bitmap.close?.();
+
+    const blob: Blob | null = await new Promise((resolve) =>
+      canvas.toBlob(resolve, "image/jpeg", JPEG_QUALITY),
+    );
+    if (!blob) return file;
+
+    const newName = file.name.replace(/\.[^.]+$/, "") + ".jpg";
+    return new File([blob], newName, { type: "image/jpeg" });
+  } catch {
+    return file; // se o browser não suportar, sobe original
+  }
+}
 
 export default function ImagePicker({
   userId,
@@ -22,7 +60,12 @@ export default function ImagePicker({
 }: Props) {
   const supabase = createClient();
   const fileRef = useRef<HTMLInputElement>(null);
-  const [uploading, setUploading] = useState(false);
+  const [stage, setStage] = useState<"idle" | "compressing" | "uploading">(
+    "idle",
+  );
+  const [progress, setProgress] = useState<{ done: number; total: number } | null>(
+    null,
+  );
   const [error, setError] = useState<string | null>(null);
 
   async function handleFiles(e: ChangeEvent<HTMLInputElement>) {
@@ -31,24 +74,33 @@ export default function ImagePicker({
 
     const remaining = maxImages - images.length;
     const accepted = files.slice(0, remaining);
+    if (accepted.length === 0) return;
 
     setError(null);
-    setUploading(true);
+    setProgress({ done: 0, total: accepted.length });
 
     const newUrls: string[] = [];
+    const erros: string[] = [];
 
-    for (const file of accepted) {
-      if (file.size > MAX_SIZE_MB * 1024 * 1024) {
-        setError(`Cada foto precisa ter menos de ${MAX_SIZE_MB}MB.`);
+    for (let i = 0; i < accepted.length; i++) {
+      const original = accepted[i];
+
+      if (!original.type.startsWith("image/")) {
+        erros.push(`${original.name}: só imagens.`);
         continue;
       }
-      if (!file.type.startsWith("image/")) {
-        setError("Só imagens.");
+      if (original.size > HARD_LIMIT_MB * 1024 * 1024) {
+        erros.push(`${original.name}: foto muito grande (acima de ${HARD_LIMIT_MB}MB).`);
         continue;
       }
+
       try {
+        setStage("compressing");
+        const file = await compressImage(original);
+
+        setStage("uploading");
         const ext = file.name.split(".").pop() || "jpg";
-        const path = `${userId}/${Date.now()}-${Math.random()
+        const path = `${userId}/${Date.now()}-${i}-${Math.random()
           .toString(36)
           .slice(2, 8)}.${ext}`;
         const { error: upErr } = await supabase.storage
@@ -60,20 +112,28 @@ export default function ImagePicker({
           .getPublicUrl(path);
         newUrls.push(data.publicUrl);
       } catch (err) {
-        setError(
+        erros.push(
           err instanceof Error ? err.message : "Erro ao enviar imagem.",
         );
       }
+
+      setProgress({ done: i + 1, total: accepted.length });
     }
 
     if (newUrls.length > 0) {
       onChange([...images, ...newUrls]);
     }
+    if (erros.length > 0) {
+      setError(erros.join(" "));
+    }
 
-    setUploading(false);
+    setStage("idle");
+    setProgress(null);
     // Reset input pra permitir reescolher o mesmo arquivo
     if (fileRef.current) fileRef.current.value = "";
   }
+
+  const uploading = stage !== "idle";
 
   function removeImage(url: string) {
     onChange(images.filter((u) => u !== url));
@@ -121,7 +181,12 @@ export default function ImagePicker({
           {uploading ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
-              Enviando…
+              {stage === "compressing" ? "Otimizando…" : "Enviando…"}
+              {progress && progress.total > 1 && (
+                <span className="text-xs font-normal">
+                  {progress.done}/{progress.total}
+                </span>
+              )}
             </>
           ) : (
             <>
