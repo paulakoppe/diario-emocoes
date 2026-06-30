@@ -29,6 +29,7 @@ export default function DiaryForm({ userId }: DiaryFormProps) {
   const [emotions, setEmotions] = useState<Emotion[]>([]);
   const [intensity, setIntensity] = useState(5);
   const [images, setImages] = useState<string[]>([]);
+  const [imagesBusy, setImagesBusy] = useState(false);
 
   function toggleEmotion(id: Emotion) {
     setEmotions((prev) =>
@@ -227,6 +228,7 @@ export default function DiaryForm({ userId }: DiaryFormProps) {
             userId={userId}
             images={images}
             onChange={setImages}
+            onBusyChange={setImagesBusy}
           />
         </div>
         <p className="text-xs text-ink-400 font-display mt-2 ml-2">
@@ -240,9 +242,15 @@ export default function DiaryForm({ userId }: DiaryFormProps) {
         </p>
       )}
 
+      {imagesBusy && (
+        <p className="text-xs font-display text-blush-500 text-center">
+          Aguarda terminar de enviar as fotos antes de salvar…
+        </p>
+      )}
+
       <button
         type="submit"
-        disabled={saving || emotions.length === 0}
+        disabled={saving || emotions.length === 0 || imagesBusy}
         className="btn-primary w-full"
       >
         {saving ? (

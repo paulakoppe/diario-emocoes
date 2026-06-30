@@ -10,6 +10,7 @@ interface Props {
   images: string[];
   onChange: (images: string[]) => void;
   maxImages?: number;
+  onBusyChange?: (busy: boolean) => void;
 }
 
 const HARD_LIMIT_MB = 25; // Limite absoluto antes mesmo de tentar comprimir
@@ -57,6 +58,7 @@ export default function ImagePicker({
   images,
   onChange,
   maxImages = 3,
+  onBusyChange,
 }: Props) {
   const supabase = createClient();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -78,6 +80,7 @@ export default function ImagePicker({
 
     setError(null);
     setProgress({ done: 0, total: accepted.length });
+    onBusyChange?.(true);
 
     const newUrls: string[] = [];
     const erros: string[] = [];
@@ -100,17 +103,28 @@ export default function ImagePicker({
 
         setStage("uploading");
         const ext = file.name.split(".").pop() || "jpg";
-        const path = `${userId}/${Date.now()}-${i}-${Math.random()
-          .toString(36)
-          .slice(2, 8)}.${ext}`;
-        const { error: upErr } = await supabase.storage
-          .from("diary-images")
-          .upload(path, file, { upsert: false, contentType: file.type });
-        if (upErr) throw upErr;
-        const { data } = supabase.storage
-          .from("diary-images")
-          .getPublicUrl(path);
-        newUrls.push(data.publicUrl);
+
+        // Tenta upload com 1 retry em caso de falha de rede
+        let uploaded = false;
+        let lastErr: Error | null = null;
+        for (let attempt = 0; attempt < 2; attempt++) {
+          const path = `${userId}/${Date.now()}-${i}-${attempt}-${Math.random()
+            .toString(36)
+            .slice(2, 8)}.${ext}`;
+          const { error: upErr } = await supabase.storage
+            .from("diary-images")
+            .upload(path, file, { upsert: false, contentType: file.type });
+          if (!upErr) {
+            const { data } = supabase.storage
+              .from("diary-images")
+              .getPublicUrl(path);
+            newUrls.push(data.publicUrl);
+            uploaded = true;
+            break;
+          }
+          lastErr = upErr as unknown as Error;
+        }
+        if (!uploaded && lastErr) throw lastErr;
       } catch (err) {
         erros.push(
           err instanceof Error ? err.message : "Erro ao enviar imagem.",
@@ -129,6 +143,7 @@ export default function ImagePicker({
 
     setStage("idle");
     setProgress(null);
+    onBusyChange?.(false);
     // Reset input pra permitir reescolher o mesmo arquivo
     if (fileRef.current) fileRef.current.value = "";
   }

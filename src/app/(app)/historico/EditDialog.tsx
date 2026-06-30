@@ -42,6 +42,7 @@ export default function EditDialog({ entry, onClose }: Props) {
   }
   const [text, setText] = useState(entry.text ?? "");
   const [images, setImages] = useState<string[]>(entry.images ?? []);
+  const [imagesBusy, setImagesBusy] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -200,6 +201,7 @@ export default function EditDialog({ entry, onClose }: Props) {
                 userId={entry.user_id}
                 images={images}
                 onChange={setImages}
+                onBusyChange={setImagesBusy}
               />
             </div>
           </div>
@@ -210,7 +212,17 @@ export default function EditDialog({ entry, onClose }: Props) {
             </p>
           )}
 
-          <button type="submit" disabled={saving} className="btn-primary w-full">
+          {imagesBusy && (
+            <p className="text-xs font-display text-blush-500 text-center">
+              Aguarda terminar de enviar as fotos antes de salvar…
+            </p>
+          )}
+
+          <button
+            type="submit"
+            disabled={saving || imagesBusy}
+            className="btn-primary w-full"
+          >
             {saving ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" /> Salvando…
