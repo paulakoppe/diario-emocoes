@@ -5,7 +5,17 @@ import { useRouter } from "next/navigation";
 import { X, Check, Loader2, Save } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { EMOTIONS } from "@/lib/emotions";
+import VoiceInput from "@/components/VoiceInput";
+import ImagePicker from "@/components/ImagePicker";
 import type { DiaryEntry, Emotion } from "@/types/database.types";
+
+function appendTranscript(prev: string, chunk: string): string {
+  const trimmed = chunk.trim();
+  if (!trimmed) return prev;
+  if (!prev) return trimmed;
+  const needsSpace = !/\s$/.test(prev);
+  return prev + (needsSpace ? " " : "") + trimmed;
+}
 
 interface Props {
   entry: DiaryEntry;
@@ -31,6 +41,7 @@ export default function EditDialog({ entry, onClose }: Props) {
     );
   }
   const [text, setText] = useState(entry.text ?? "");
+  const [images, setImages] = useState<string[]>(entry.images ?? []);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -62,6 +73,7 @@ export default function EditDialog({ entry, onClose }: Props) {
           emotions,
           intensity,
           text: text.trim() || null,
+          images: images.length > 0 ? images : null,
         })
         .eq("id", entry.id)
         .select();
@@ -176,6 +188,20 @@ export default function EditDialog({ entry, onClose }: Props) {
               rows={4}
               className="input-field resize-none"
             />
+            <div className="mt-3">
+              <VoiceInput
+                onTranscript={(chunk) =>
+                  setText((prev) => appendTranscript(prev, chunk))
+                }
+              />
+            </div>
+            <div className="mt-4">
+              <ImagePicker
+                userId={entry.user_id}
+                images={images}
+                onChange={setImages}
+              />
+            </div>
           </div>
 
           {error && (

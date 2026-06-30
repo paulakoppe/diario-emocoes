@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Send, Pencil, Trash2, Check } from "lucide-react";
 import { emotionById, getEntryEmotions } from "@/lib/emotions";
 import type { DiaryEntry } from "@/types/database.types";
@@ -118,6 +119,40 @@ export default function DiaryEntryCard({
         <p className="text-sm text-ink-500 leading-relaxed whitespace-pre-wrap break-words mb-3">
           {entry.text}
         </p>
+      )}
+
+      {entry.images && entry.images.length > 0 && (
+        <div
+          className={`grid gap-2 mb-3 ${
+            entry.images.length === 1
+              ? "grid-cols-1"
+              : entry.images.length === 2
+                ? "grid-cols-2"
+                : "grid-cols-3"
+          }`}
+        >
+          {entry.images.map((url) => (
+            <a
+              key={url}
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="relative aspect-square rounded-2xl overflow-hidden bg-cream-200 block"
+              onClick={(e) => {
+                if (selectable) e.preventDefault();
+              }}
+            >
+              <Image
+                src={url}
+                alt="Foto do registro"
+                fill
+                sizes="(max-width: 768px) 33vw, 200px"
+                className="object-cover"
+                unoptimized
+              />
+            </a>
+          ))}
+        </div>
       )}
 
       {!selectable && (

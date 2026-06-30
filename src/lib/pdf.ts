@@ -7,7 +7,25 @@ export interface PdfMeta {
   userEmail?: string | null;
 }
 
-function drawEntryOnDoc(doc: jsPDF, entry: DiaryEntry, meta: PdfMeta) {
+async function imageUrlToDataUrl(url: string): Promise<string> {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("Falha ao carregar imagem");
+  const blob = await res.blob();
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result as string);
+    reader.onerror = () => reject(new Error("Falha ao ler imagem"));
+    reader.readAsDataURL(blob);
+  });
+}
+
+function detectImageFormat(dataUrl: string): "JPEG" | "PNG" | "WEBP" {
+  if (dataUrl.startsWith("data:image/png")) return "PNG";
+  if (dataUrl.startsWith("data:image/webp")) return "WEBP";
+  return "JPEG";
+}
+
+async function drawEntryOnDoc(doc: jsPDF, entry: DiaryEntry, meta: PdfMeta) {
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 56;
 
@@ -143,20 +161,77 @@ function drawEntryOnDoc(doc: jsPDF, entry: DiaryEntry, meta: PdfMeta) {
     doc.internal.pageSize.getHeight() - 30,
     { align: "center" },
   );
+
+  // Imagens (página dedicada, se houver)
+  if (entry.images && entry.images.length > 0) {
+    doc.addPage();
+
+    // Fundo + faixa
+    doc.setFillColor(255, 248, 243);
+    doc.rect(0, 0, pageWidth, doc.internal.pageSize.getHeight(), "F");
+    doc.setFillColor(244, 182, 194);
+    doc.rect(0, 0, pageWidth, 8, "F");
+
+    // Header da página de fotos
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(16);
+    doc.setTextColor(74, 68, 64);
+    doc.text("Fotos do registro", margin, 70);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(122, 116, 112);
+    doc.text(`${dateStr} · ${timeStr}`, margin, 88);
+
+    // Grid 2 colunas
+    const imgSize = 220;
+    const gap = 20;
+    const startY = 110;
+
+    for (let i = 0; i < entry.images.length; i++) {
+      try {
+        const dataUrl = await imageUrlToDataUrl(entry.images[i]);
+        const fmt = detectImageFormat(dataUrl);
+        const col = i % 2;
+        const row = Math.floor(i / 2);
+        const x = margin + col * (imgSize + gap);
+        const y = startY + row * (imgSize + gap);
+        doc.addImage(dataUrl, fmt, x, y, imgSize, imgSize);
+      } catch {
+        // Imagem inacessível — pula silenciosamente
+      }
+    }
+
+    // Rodapé
+    doc.setFontSize(9);
+    doc.setTextColor(180, 174, 170);
+    doc.text(
+      "Diário de Emoções",
+      pageWidth / 2,
+      doc.internal.pageSize.getHeight() - 30,
+      { align: "center" },
+    );
+  }
 }
 
-export function buildEntryPdf(entry: DiaryEntry, meta: PdfMeta): jsPDF {
+export async function buildEntryPdf(
+  entry: DiaryEntry,
+  meta: PdfMeta,
+): Promise<jsPDF> {
   const doc = new jsPDF({ unit: "pt", format: "a4" });
-  drawEntryOnDoc(doc, entry, meta);
+  await drawEntryOnDoc(doc, entry, meta);
   return doc;
 }
 
-export function buildEntriesPdf(entries: DiaryEntry[], meta: PdfMeta): jsPDF {
+export async function buildEntriesPdf(
+  entries: DiaryEntry[],
+  meta: PdfMeta,
+): Promise<jsPDF> {
   const doc = new jsPDF({ unit: "pt", format: "a4" });
-  entries.forEach((entry, i) => {
+  for (let i = 0; i < entries.length; i++) {
     if (i > 0) doc.addPage();
-    drawEntryOnDoc(doc, entry, meta);
-  });
+    await drawEntryOnDoc(doc, entries[i], meta);
+  }
   return doc;
 }
 

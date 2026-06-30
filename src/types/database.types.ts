@@ -25,6 +25,7 @@ export interface DiaryEntry {
   emotions: Emotion[];
   intensity: number;
   text: string | null;
+  images: string[] | null;
   created_at: string;
 }
 
@@ -61,6 +62,7 @@ export type Database = {
           emotions: Emotion[];
           intensity: number;
           text?: string | null;
+          images?: string[] | null;
           created_at?: string;
         };
         Update: {
@@ -69,6 +71,7 @@ export type Database = {
           emotions?: Emotion[];
           intensity?: number;
           text?: string | null;
+          images?: string[] | null;
           created_at?: string;
         };
         Relationships: [];

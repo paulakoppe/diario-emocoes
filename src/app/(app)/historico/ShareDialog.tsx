@@ -44,9 +44,13 @@ export default function ShareDialog({
     return () => window.removeEventListener("keydown", onEsc);
   }, [onClose]);
 
-  function handleDownload() {
-    const doc = buildEntriesPdf(entries, { userName, userEmail });
-    downloadPdf(doc, buildFilename(entries));
+  async function handleDownload() {
+    try {
+      const doc = await buildEntriesPdf(entries, { userName, userEmail });
+      downloadPdf(doc, buildFilename(entries));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro ao gerar PDF.");
+    }
   }
 
   async function handleSend(e: FormEvent) {
@@ -55,7 +59,7 @@ export default function ShareDialog({
     setSending(true);
 
     try {
-      const doc = buildEntriesPdf(entries, { userName, userEmail });
+      const doc = await buildEntriesPdf(entries, { userName, userEmail });
       const pdfBase64 = pdfToBase64(doc);
       const filename = buildFilename(entries);
 

@@ -6,14 +6,29 @@ import { useRouter } from "next/navigation";
 import { Check, Loader2, History, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { EMOTIONS } from "@/lib/emotions";
+import VoiceInput from "@/components/VoiceInput";
+import ImagePicker from "@/components/ImagePicker";
 import type { Emotion } from "@/types/database.types";
 
-export default function DiaryForm() {
+interface DiaryFormProps {
+  userId: string;
+}
+
+function appendTranscript(prev: string, chunk: string): string {
+  const trimmed = chunk.trim();
+  if (!trimmed) return prev;
+  if (!prev) return trimmed;
+  const needsSpace = !/\s$/.test(prev);
+  return prev + (needsSpace ? " " : "") + trimmed;
+}
+
+export default function DiaryForm({ userId }: DiaryFormProps) {
   const router = useRouter();
   const supabase = createClient();
 
   const [emotions, setEmotions] = useState<Emotion[]>([]);
   const [intensity, setIntensity] = useState(5);
+  const [images, setImages] = useState<string[]>([]);
 
   function toggleEmotion(id: Emotion) {
     setEmotions((prev) =>
@@ -54,6 +69,7 @@ export default function DiaryForm() {
         emotions,
         intensity,
         text: text.trim() || null,
+        images: images.length > 0 ? images : null,
       });
       if (error) throw error;
 
@@ -62,6 +78,7 @@ export default function DiaryForm() {
       setEmotions([]);
       setIntensity(5);
       setText("");
+      setImages([]);
       setTimeout(() => setSavedFlag(false), 2500);
       router.refresh();
     } catch (err) {
@@ -198,6 +215,20 @@ export default function DiaryForm() {
           rows={5}
           className="input-field resize-none"
         />
+        <div className="mt-3">
+          <VoiceInput
+            onTranscript={(chunk) =>
+              setText((prev) => appendTranscript(prev, chunk))
+            }
+          />
+        </div>
+        <div className="mt-4">
+          <ImagePicker
+            userId={userId}
+            images={images}
+            onChange={setImages}
+          />
+        </div>
         <p className="text-xs text-ink-400 font-display mt-2 ml-2">
           Opcional.
         </p>
