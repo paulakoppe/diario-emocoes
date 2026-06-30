@@ -87,13 +87,16 @@ export default function ImagePicker({
 
     for (let i = 0; i < accepted.length; i++) {
       const original = accepted[i];
+      const tag = `Foto ${i + 1}`;
 
       if (!original.type.startsWith("image/")) {
-        erros.push(`${original.name}: só imagens.`);
+        erros.push(`${tag}: não é imagem (${original.type || "tipo desconhecido"}).`);
         continue;
       }
       if (original.size > HARD_LIMIT_MB * 1024 * 1024) {
-        erros.push(`${original.name}: foto muito grande (acima de ${HARD_LIMIT_MB}MB).`);
+        erros.push(
+          `${tag}: muito grande (${(original.size / 1024 / 1024).toFixed(1)}MB, limite ${HARD_LIMIT_MB}MB).`,
+        );
         continue;
       }
 
@@ -101,12 +104,17 @@ export default function ImagePicker({
         setStage("compressing");
         const file = await compressImage(original);
 
+        // Log útil pra debug
+        console.log(
+          `[ImagePicker] ${tag} | original ${original.type} ${(original.size / 1024).toFixed(0)}KB | upload ${file.type} ${(file.size / 1024).toFixed(0)}KB`,
+        );
+
         setStage("uploading");
         const ext = file.name.split(".").pop() || "jpg";
 
         // Tenta upload com 1 retry em caso de falha de rede
         let uploaded = false;
-        let lastErr: Error | null = null;
+        let lastErrMsg = "";
         for (let attempt = 0; attempt < 2; attempt++) {
           const path = `${userId}/${Date.now()}-${i}-${attempt}-${Math.random()
             .toString(36)
@@ -120,15 +128,22 @@ export default function ImagePicker({
               .getPublicUrl(path);
             newUrls.push(data.publicUrl);
             uploaded = true;
+            console.log(`[ImagePicker] ${tag} | OK ${data.publicUrl}`);
             break;
           }
-          lastErr = upErr as unknown as Error;
+          lastErrMsg = upErr.message || "erro desconhecido";
+          console.warn(
+            `[ImagePicker] ${tag} | tentativa ${attempt + 1} falhou:`,
+            upErr,
+          );
         }
-        if (!uploaded && lastErr) throw lastErr;
+        if (!uploaded) {
+          erros.push(`${tag}: ${lastErrMsg}`);
+        }
       } catch (err) {
-        erros.push(
-          err instanceof Error ? err.message : "Erro ao enviar imagem.",
-        );
+        const msg = err instanceof Error ? err.message : "erro inesperado";
+        console.error(`[ImagePicker] ${tag} | exceção:`, err);
+        erros.push(`${tag}: ${msg}`);
       }
 
       setProgress({ done: i + 1, total: accepted.length });
@@ -138,7 +153,11 @@ export default function ImagePicker({
       onChange([...images, ...newUrls]);
     }
     if (erros.length > 0) {
-      setError(erros.join(" "));
+      const okCount = newUrls.length;
+      const totalCount = accepted.length;
+      setError(
+        `Enviadas ${okCount} de ${totalCount}. ${erros.join(" — ")}`,
+      );
     }
 
     setStage("idle");
